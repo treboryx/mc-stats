@@ -1,0 +1,19 @@
+{
+  "name": "crafty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "discord.js": "^11.5.1",
+    "moment": "^2.24.0",
+    "moment-duration-format": "^2.3.2",
+    "node-fetch": "^2.6.0"
+  }
+}
