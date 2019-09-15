@@ -17,6 +17,20 @@ Object.size = (obj) => {
   return size;
 };
 
+const camelCase = (val) => {
+  if (val.includes(" ")) {
+    const t = val.split(" ");
+    const res = [];
+    res.push(t[0]);
+    for (let k = 1; t.length > k; k++) {
+      res.push(t[k].toProperCase());
+    }
+    return res.join("");
+  } else {
+    return val;
+  }
+}; 
+
 module.exports = {
   blocksmc: (username) => { // completed
     return new Promise((resolve, reject) => {
@@ -61,10 +75,11 @@ module.exports = {
           const res = {
             "status": 1568288492518 < Date.now() ? "offline" : "online",
             "name": json.player.displayname,
+            "rank": json.player.rank ? json.player.rank : null,
             "level": hypixelLevel(json.player.networkExp),
             "exp": json.player.networkExp,
-            "karma": json.player.karma,
-            "votes": json.player.voting.total,
+            "karma": json.player.karma ? json.player.karma : null ,
+            "votes": json.player.voting ? json.player.voting.total : 0,
             "achievements": Object.size(json.player.achievements),
             "completedParkours": Object.size(json.player.parkourCompletions),
             "lastGame": json.player.mostRecentGameType,
@@ -294,20 +309,6 @@ module.exports = {
           const lastSeen = $(".dd-profile-details h4").text().split("\n")[1].trim();
           Object.assign(data, { name, rank, playtime, firstSeen, lastSeen });
           const games = ["herbal", "jurassic", "kingdom", "marvel", "mystic", "space", "western"];
-
-          const clean = (val) => {
-            if (val.includes(" ")) {
-              const t = val.split(" ");
-              const res = [];
-              res.push(t[0]);
-              for (let k = 1; t.length > k; k++) {
-                res.push(t[k].toProperCase());
-              }
-              return res.join("");
-            } else {
-              return val;
-            }
-          }; 
           for (let i = 0; games.length > i; i++) {
             const d = await fetch(`https://www.minesaga.org/player/${username}/${games[i]}`).then(res => res.text());
             const $ = cheerio.load(d);
@@ -315,7 +316,7 @@ module.exports = {
             $("div.dd-section").each(function () {
               $(this).find("div.dd-stats").each(function () {
                 $(this).find("dt").each(function () {
-                  Object.assign(stats, { [clean($(this).text().trim().toLowerCase())]: $(this).parent().find("dd").text().trim().toLowerCase()});
+                  Object.assign(stats, { [camelCase($(this).text().trim().toLowerCase())]: $(this).parent().find("dd").text().trim().toLowerCase()});
                 });
               });
             });
@@ -324,6 +325,34 @@ module.exports = {
               stats
             });
           }
+          resolve(data);
+        });
+    });
+  },
+
+  gommehd: (username) => { // completed
+    return new Promise((resolve, reject) => {
+      if (!username) return resolve({"errors": "No username provided"});
+      fetch(`https://www.gommehd.net/player/index?playerName=${username}`)
+        .then(res => res.text())
+        .then(async body => {
+          var data = { games: [] };
+          const $ = cheerio.load(body);
+          if ($.text().trim().includes("User not found")) return resolve({"errors": "User not found"});
+          const name = $("div.user_info").text().trim().split(" ")[0];
+          Object.assign(data, { name });
+          $(".stat-table").each(function () {
+            const stats = {};
+            $(this).find("div.gametype-stats").each(function () {
+              $(this).find("li").each(function () {
+                Object.assign(stats, { [camelCase($(this).not(".score").text().trim().toLowerCase().split("\n")[2])]: $(this).not(".score").text().trim().toLowerCase().split("\n")[0]});
+              });
+            });
+            data.games.push({
+              game: $(this).find("div.map-content-wrap").text().trim().toLowerCase(),
+              stats
+            });
+          });
           resolve(data);
         });
     });
