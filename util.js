@@ -1,5 +1,4 @@
 const fetch         = require("node-fetch");
-const { parse }     = require("node-html-parser");
 const cheerio       = require("cheerio");
 const keys          = require("./keys.json");
 const moment        = require("moment");
@@ -279,7 +278,7 @@ module.exports = {
     });
   },
 
-  minesaga: (username) => { // incomplete
+  minesaga: (username) => { // completed
     return new Promise((resolve, reject) => {
       if (!username) return resolve({"errors": "No username provided"});
       fetch(`https://www.minesaga.org/player/${username}`)
