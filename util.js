@@ -56,7 +56,7 @@ module.exports = {
           });
 
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -89,7 +89,7 @@ module.exports = {
             "socialMedia": json.player.socialMedia ? json.player.socialMedia.links : null
           };
           resolve(res);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
   
@@ -106,7 +106,7 @@ module.exports = {
         .then(res => res.json())
         .then(async json => {
           resolve(json);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -156,7 +156,7 @@ module.exports = {
         .then(res => res.json())
         .then(async json => {
           resolve(json);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -227,7 +227,7 @@ module.exports = {
             }
           });
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -257,7 +257,7 @@ module.exports = {
             // }
           });
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -289,7 +289,7 @@ module.exports = {
             }, {});
           data.games.push(filtered);
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -326,7 +326,7 @@ module.exports = {
             });
           }
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
@@ -354,7 +354,7 @@ module.exports = {
             });
           });
           resolve(data);
-        });
+        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
     });
   },
 
