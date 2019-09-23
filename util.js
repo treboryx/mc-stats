@@ -1,12 +1,14 @@
-const fetch         = require("node-fetch");
+const fetch         = require("node-fetch"); // Main http module
 const cheerio       = require("cheerio");
 const keys          = require("./keys.json");
 const moment        = require("moment");
+const cloudscraper  = require("cloudscraper"); // This package bypasses cloudflare anti-bot page, which is needed in some cases
+const omitEmpty     = require("omit-empty"); // really cool package that checks for empty proterties in objects
 require("moment-duration-format");
 require("tls").DEFAULT_ECDH_CURVE = "auto";
 
 String.prototype.toProperCase = function () {
-  return this.replace(/([^\W_]+[^\s-]*) */g, function (txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+  return this.replace(/([^\W_]+[^\s-]*) */g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 };
 
 Object.size = (obj) => {
@@ -56,7 +58,10 @@ module.exports = {
           });
 
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -89,7 +94,10 @@ module.exports = {
             "socialMedia": json.player.socialMedia ? json.player.socialMedia.links : null
           };
           resolve(res);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
   
@@ -106,7 +114,10 @@ module.exports = {
         .then(res => res.json())
         .then(async json => {
           resolve(json);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -156,7 +167,10 @@ module.exports = {
         .then(res => res.json())
         .then(async json => {
           resolve(json);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -227,7 +241,10 @@ module.exports = {
             }
           });
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -257,7 +274,10 @@ module.exports = {
             // }
           });
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -289,7 +309,10 @@ module.exports = {
             }, {});
           data.games.push(filtered);
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -326,7 +349,10 @@ module.exports = {
             });
           }
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
@@ -354,7 +380,181 @@ module.exports = {
             });
           });
           resolve(data);
-        }).catch(e => resolve({"errors": "Can't fetch stats, API is probably offline."}));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
+    });
+  },
+
+  timolia: (username) => { // incomplete
+    return new Promise((resolve, reject) => {
+      if (!username) return resolve({"errors": "No username provided"});
+      fetch(`https://www.timolia.de/stats/${username}`)
+        .then(res => res.text())
+        .then(async body => {
+
+          const clean = (val) => {
+            if (val == "Spiele gespielt") {
+              return "gamesPlayed";
+            } else if (val == "Spiele gewonnen") {
+              return "wins";
+            } else if (val == "Knapp gewonnen") {
+              return "hardWins";
+            } else if (val == "eZ gewonnen") {
+              return "easyWins";
+            } else if (val == "K/D") {
+              return "kd";
+            } else if (val == "Punkte") {
+              return "points";
+            } else if (val == "Siege insg.") {
+              return "totalWins";
+            } else if (val == "Tode insgesamt") {
+              return "totalDeaths";
+            } else if (val == "Meiste Kills pro Spiel") {
+              return "mostKillsPerGame";
+            } else if (val == "Durchschnittsrang") {
+              return "avgRank";
+            } else if (val == "Rang") {
+              return "rank";
+            } else if (val == "Duelle gespielt") {
+              return "duelsPlayed";
+            } else if (val == "Duelle gewonnen") {
+              return "duelWins";
+            } else if (val == "Insg. versucht") {
+              return "castTries";
+            } else if (val == "Insg. geschafft") {
+              return "castMade";
+            } else if (val == "Abgeschlossen") {
+              return "completed";
+            } else if (val == "Tagesieger beendet") {
+              return "dayWinnerFinished";
+            } else if (val == "Tagessieger insg.") {
+              return "dayWinnerTotal";
+            } else if (val == "JnRs veröffentlicht") {
+              return "jnrReleased";
+            } else if (val == "Gesammelte Favos") {
+              return "collectedFavos";
+            } else if (val == "Durchschnittsrang") {
+              return "";
+            } else if (val == "Durchschnittsrang") {
+              return "";
+            } else if (val.includes("ème")) {
+              return val.replace("ème", "");
+            } else if (val.includes(" ")) {
+              return val.replace(" ", "");
+            } else {
+              return val;
+            }
+          };
+
+          var data = { games: [] };
+          const $ = cheerio.load(body);
+          const name = $("h2#playername").text().trim();
+          const rank = $(".stat-column td .label").not(".label-success").not(".label-danger").text().trim();
+          // const status = $("table.table tbody td").text()
+          const calcFirstLogin = (input) => {
+            var d = input.split(" ")[0];
+            var t = input.split(" ")[1];
+            var arr = d.split(".");
+            var final = new Date(`${arr[2]}-${arr[1]}-${arr[0]}T${t}`);
+            return `${moment(final).format("MMM Do YYYY")} (${moment(final).fromNow()})`;
+          };
+          const firstLogin = calcFirstLogin($("table.table tbody tr").children("td").text().split(rank)[1].split("\n")[0]);
+          const friends = $("table.table tbody tr").children("td").text().split(rank)[1].split("\n")[1].trim();
+          Object.assign(data, { name, rank, firstLogin, friends });
+          $(".stat-column").each(function () {
+            const stats = {};
+            $(this).find("tbody").each(function () {
+              $(this).find(".stats-table-field").each(function () {
+                // console.log($(this).find("td").not(".align-right").text() + " " + $(this).find("td").last().text())
+                Object.assign(stats, { [camelCase($(this).find("td").not(".align-right").text())]: $(this).find("td").last().text()});
+              });
+            });
+            if ($(this).find("th.stat-header").text().trim().toLowerCase()) {
+              data.games.push({
+                game: $(this).find("th.stat-header").text().trim().toLowerCase(),
+                stats
+              });
+            }
+          });
+          resolve(data.games);
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
+    });
+  },
+
+  minemen: (username) => { // incomplete - need to figure out how to bypass the cloudflare challenge
+    return new Promise(async (resolve, reject) => {
+      if (!username) return resolve({"errors": "No username provided"});
+      await cloudscraper.get(`https://minemen.club/player/${username}`)
+        .then(async body => {
+          var data = { games: [] };
+          const $ = cheerio.load(body);
+          // Object.assign(data, { name, status, rank });
+          // $(".stat-table").each(function () {
+          //   const stats = {};
+          //   $(this).find("div.gametype-stats").each(function () {
+          //     $(this).find("li").each(function () {
+          //       Object.assign(stats, { [camelCase($(this).not(".score").text().trim().toLowerCase().split("\n")[2])]: $(this).not(".score").text().trim().toLowerCase().split("\n")[0]});
+          //     });
+          //   });
+          //   data.games.push({
+          //     game: $(this).find("div.map-content-wrap").text().trim().toLowerCase(),
+          //     stats
+          //   });
+          // });
+          resolve(data);
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
+    });
+  },
+
+  veltpvp: (username) => { // 
+    return new Promise(async (resolve, reject) => {
+      if (!username) return resolve({"errors": "No username provided"});
+      await cloudscraper.get(`https://www.veltpvp.com/u/${username}`)
+        .then(async body => {
+          const calcFirstLogin = (input) => {
+            var arr = input.split("/");
+            var final = new Date(`${arr[2]}-${arr[1]}-${arr[0]}`);
+            return `${moment(final).format("MMM Do YYYY")} (${moment(final).fromNow()})`;
+          };
+          
+          var data = { games: [] };
+          const $ = cheerio.load(body);
+          if ($.text().trim().includes("not found")) return resolve({"errors": "User not found"});
+          const name = $("h1#name").text().trim();
+          let status = $("div.top").text().trim(); // offline/online/banned
+          if (status.includes(" ")) status = status.split(" ")[1].toLowerCase(); 
+          let seen;
+          if (status === "offline") {
+            seen = $("div.bottom").text().trim().split("\n ")[0] + " " + $("div.bottom").text().trim().split("\n ")[1].trim();
+          } else if (status === "online") {
+            seen = $("div.bottom").text().trim();
+          }
+          const rank = $("div#profile h2").text().trim();
+          const firstLogin = calcFirstLogin($("div.content strong").text().trim().substring(0, 10));
+          Object.assign(data, { name, status, rank, firstLogin, seen });
+          $(".server").each(function () {
+            const stats = {};
+            $(this).find("div.server-stat").each(function () {
+              Object.assign(stats, { [camelCase($(this).find(".server-stat-description").text().trim().toLowerCase())]: $(this).find(".server-stat-number").text().trim().toLowerCase()});
+            });
+            data.games.push({
+              game: $(this).find(".server-header").text().trim().toLowerCase(),
+              stats
+            });
+          });
+          resolve(omitEmpty(data));
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
     });
   },
 
