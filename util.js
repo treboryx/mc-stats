@@ -558,6 +558,143 @@ module.exports = {
     });
   },
 
+  universocraft: (username) => { // semi-completed - last login yet to be done
+    return new Promise((resolve, reject) => {
+      if (!username) return resolve({"errors": "No username provided"});
+      fetch(`https://stats.universocraft.com/stats.php?player=${username}`)
+        .then(res => res.text())
+        .then(async body => {
+          var data = { games: [] };
+          const $ = cheerio.load(body);
+          if ($.text().trim().includes("No se ha encontrado")) return resolve({"errors": "User not found"});
+          const clean = (input) => {
+            input = input.toUpperCase();
+            if (input == "VICTORIAS") {
+              return "wins";
+            } else if (input == "ASESINATOS") {
+              return "kills";
+            } else if (input == "MUERTES") {
+              return "deaths";
+            } else if (input == "GOLES") {
+              return "goals";
+            } else if (input == "PARTIDAS JUGADAS") {
+              return "matchesPlayed";
+            } else if (input == "BLOQUES COLOCADOS") {
+              return "placedBlocks";
+            } else if (input == "BLOQUES DESTRUIDOS") {
+              return "destroyedBlocks";
+            } else if (input == "PROJECTILES LANZADOS") {
+              return "launchedProjectiles";
+            } else if (input == "PROJECTILES IMPACTADOS") {
+              return "impactedProjectiles";
+            } else if (input == "ASESINATOS FINALES") {
+              return "finalKills";
+            } else if (input == "CAMAS DESTRUIDAS") {
+              return "destroyedBeds";
+            } else if (input == "MUERTES FINALES") {
+              return "finalDeaths";
+            } else if (input == "CONSTRUCCIONES PERFECTAS") {
+              return "perfectConstructions";
+            } else if (input == "PERDIDAS") {
+              return "losses";
+            } else if (input == "VICTORIAS TOTALES") {
+              return "totalWins";
+            } else if (input == "VICTORIAS COMO CORREDOR") {
+              return "winsAsBroker";
+            } else if (input == "VICTORIAS COMO BESTIA") {
+              return "winsAsBeast";
+            } else if (input == "ASESINATO COMO CORREDOR") {
+              return "killsAsBroker";
+            } else if (input == "ASESINATO COMO BESTIA") {
+              return "killsAsBeast";
+            } else if (input == "PUNTAJE") {
+              return "score";
+            } else if (input == "ASESINATOS CON ARCO") {
+              return "murderWithArch";
+            } else if (input == "DISTANCIA MÁXIMA DE MUERTE CON ARCO") {
+              return "maximumDistanceOfDeathWithArc";
+            } else if (input == "LANAS COLOCADAS") {
+              return "placedWool";
+            } else {
+              return camelCase(input);
+            }
+          };
+          const name = $("div.player-info h1").text().trim();
+          const rank = $("div.player-rank").text().trim().toProperCase();
+          const lastLogin = $("div.player-description p").not("p strong").text().trim().toProperCase(); // need to figure out this
+          Object.assign(data, { name, rank, lastLogin });
+          $("div.game").each(function () {
+            const stats = {};
+
+            if ($(this).find(".game-header-title").text().trim().toLowerCase() !== "thebridge") {
+              $(this).find("div.game-content").each(function () {
+                $(this).find(".game-stat").each(function () {
+                  Object.assign(stats, { [clean($(this).find(".game-stat-title").text().trim().toLowerCase())]: $(this).find(".game-stat-count").text().trim().toLowerCase() });
+                });
+              });
+              data.games.push({
+                game: camelCase($(this).find(".game-header-title").text().trim().toLowerCase()),
+                stats
+              });
+            }
+
+            if ($(this).find(".game-header-title").text().trim().toLowerCase() == "thebridge") {
+              $(this).find("div.game-content").each(function () {
+                const gamemode = {};
+                let gameModeName, obj;
+
+                $(this).find("div#thebridgetotal").each(function () {
+                  gameModeName = "total";
+                  // console.log($(this).text())
+                  $(this).find(".game-stat").each(function () {
+                    Object.assign(gamemode, { [clean($(this).find(".game-stat-title").text().trim().toLowerCase())]: $(this).find(".game-stat-count").text().trim().toLowerCase() });
+                  });
+                  obj = { [gameModeName]:  gamemode };
+                  Object.assign(stats, obj);
+                });
+
+                $(this).find("div#thebridgesolo").each(function () {
+                  gameModeName = "solo";
+                  $(this).find(".game-stat").each(function () {
+                    Object.assign(gamemode, { [clean($(this).find(".game-stat-title").text().trim().toLowerCase())]: $(this).find(".game-stat-count").text().trim().toLowerCase() });
+                  });
+                  obj = { [gameModeName]:  gamemode };
+                  Object.assign(stats, obj);
+                });
+
+                $(this).find("div#thebridgedoubles").each(function () {
+                  gameModeName = "doubles";
+                  $(this).find(".game-stat").each(function () {
+                    Object.assign(gamemode, { [clean($(this).find(".game-stat-title").text().trim().toLowerCase())]: $(this).find(".game-stat-count").text().trim().toLowerCase() });
+                  });
+                  obj = { [gameModeName]:  gamemode };
+                  Object.assign(stats, obj);
+                });
+
+                $(this).find("div#thebridgetriples").each(function () {
+                  gameModeName = "triples";
+                  $(this).find(".game-stat").each(function () {
+                    Object.assign(gamemode, { [clean($(this).find(".game-stat-title").text().trim().toLowerCase())]: $(this).find(".game-stat-count").text().trim().toLowerCase() });
+                  });
+                  obj = { [gameModeName]:  gamemode };
+                  Object.assign(stats, obj);
+                });
+              });
+              data.games.push({
+                game: camelCase($(this).find(".game-header-title").text().trim().toLowerCase()),
+                stats
+              });
+            }
+          });
+          resolve(data);
+        }).catch(e =>  {
+          resolve({"errors": "Can't fetch stats, API is probably offline."});
+          console.log(e);
+        });
+    });
+  },
+
+
 };
 
 
