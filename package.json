@@ -1,5 +1,5 @@
 {
-  "name": "crafty",
+  "name": "mc-stats",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -8,7 +8,7 @@
     "dev": "nodemon ./test/test.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "cloudscraper": "^4.1.4",
