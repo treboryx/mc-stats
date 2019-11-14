@@ -18,5 +18,8 @@
     "node-fetch": "^2.6.0",
     "omit-empty": "^1.0.0",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0"
   }
 }
