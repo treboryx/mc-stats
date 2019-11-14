@@ -21,5 +21,8 @@
   },
   "devDependencies": {
     "eslint": "^6.6.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }
