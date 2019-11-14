@@ -29,32 +29,42 @@
       "always"
     ],
     "keyword-spacing": [
-      "error", {
+      "error",
+      {
         "before": true,
         "after": true
       }
     ],
     "space-before-blocks": [
-      "error", {
-        "functions":"always",
+      "error",
+      {
+        "functions": "always",
         "keywords": "always",
         "classes": "always"
       }
     ],
     "space-before-function-paren": [
-      "error", {
+      "error",
+      {
         "anonymous": "always",
         "named": "always",
         "asyncArrow": "always"
       }
     ],
     "prefer-const": [
-      "error", {
+      "error",
+      {
         "destructuring": "any",
         "ignoreReadBeforeAssign": false
       }
     ],
     "no-unused-vars": [
+      "off"
+    ],
+    "no-prototype-builtins": [
+      "off"
+    ],
+    "no-async-promise-executor": [
       "off"
     ]
   }
