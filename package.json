@@ -1,6 +1,6 @@
 {
-  "name": "@treboryx/mc-stats",
-  "version": "1.0.0",
+  "name": "mc-stats",
+  "version": "1.0.1",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -22,8 +22,5 @@
   "devDependencies": {
     "eslint": "^6.6.0",
     "jest": "^24.9.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   }
 }
