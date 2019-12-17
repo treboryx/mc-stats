@@ -7,7 +7,7 @@ const main = async () => {
   // mc.mineplex("xeiu").then(r => console.log(r));
   // mc.manacube("KaiYara12").then(r => console.log(r));
   // mc.minesaga("doitnowornever").then(r => console.log(r));
-  // mc.gommehd("123123").then(r => console.log(r));
+  // mc.gommehd("YouBetterGoAfk").then(r => console.log(r));
   // mc.timolia("XxSt3gsfanxX").then(r => console.log(r));
   // mc.minemen("Cleid").then(r => console.log(r));
   // mc.veltpvp("DissTracks").then(r => console.log(r));
@@ -44,12 +44,12 @@ const main = async () => {
 
 
 
-  
-  
+
+
 
 
 
 
 };
-  
+
 main();
