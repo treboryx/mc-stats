@@ -41,14 +41,8 @@ const main = async () => {
   // mc.hivemc("Marleeey", "MIMV").then(r => console.log(r));
   // mc.hivemc("HappyStateOfMind", "BED").then(r => console.log(r));
 
-
-
-
-
-
-
-
-
+  // mc.wynncraft("player", "1MCRocker").then(r => console.log(r));
+  // mc.wynncraft("guild", "Imperial").then(r => console.log(r));
 
 };
 
