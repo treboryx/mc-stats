@@ -10,7 +10,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "cloudscraper": "^4.1.4",
     "moment": "^2.24.0",
