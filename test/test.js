@@ -1,7 +1,7 @@
 const mc = require("../app.js");
 
 const main = async () => {
-    async function guild () {
+  async function guild () {
     return new Promise((resolve, reject) => {
       const fetch = require("node-fetch");
       const { createCanvas, loadImage } = require("canvas");
