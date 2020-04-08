@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "eslint --fix .",
+    "lint": "eslint --fix .",
     "dev": "nodemon ./test/test.js"
   },
   "author": "",
@@ -20,6 +20,12 @@
   },
   "devDependencies": {
     "eslint": "^6.6.0",
+    "husky": "^4.2.3",
     "jest": "^24.9.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }

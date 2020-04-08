@@ -320,8 +320,7 @@ const main = async () => {
   // mc.veltpvp("DissTracks").then(r => console.log(r));
   // mc.universocraft("ImOvee_Idk").then(r => console.log(r));
   // mc.hypixelBoosters().then(r => console.log(r));
-  mc.minemen("NiceTryEfe").then(r => console.log(r));
-
+  // mc.minemen("NiceTryEfe").then(r => console.log(r));
   // mc.hivemc("Gooogle_it", "profile").then(r => console.log(r));
   // mc.hivemc("jonas2246", "SG").then(r => console.log(r));
   // mc.hivemc("Tutle", "BP").then(r => console.log(r));
@@ -348,10 +347,8 @@ const main = async () => {
   // mc.hivemc("IDontExquseYou", "SPL").then(r => console.log(r));
   // mc.hivemc("Marleeey", "MIMV").then(r => console.log(r));
   // mc.hivemc("HappyStateOfMind", "BED").then(r => console.log(r));
-
   // mc.wynncraft("player", "1MCRocker").then(r => console.log(r));
   // mc.wynncraft("guild", "Imperial").then(r => console.log(r));
-
 };
 
 main();
