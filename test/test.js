@@ -1,8 +1,10 @@
 const mc = require("../app.js");
 
 const main = async () => {
+  // mc.mccentral("kitpvp", "leaderboard").then(r => console.log(r));
+  // mc.munchymc("badboyhalo", "player").then(r => console.log(r));
   // mc.hypixelPlayer("Dinnerbone").then(r => console.log(r));
-  // mc.blocksmc("_IPlozSawdadawd").then(r => console.log(r));
+  // mc.blocksmc("_IPlozSawdadawd". "player").then(r => console.log(r));
   // mc.funcraft("nathan818").then(r => console.log(r));
   // mc.mineplex("xeiu").then(r => console.log(r));
   // mc.manacube("KaiYara12").then(r => console.log(r));

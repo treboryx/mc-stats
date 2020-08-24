@@ -14,6 +14,8 @@
 
 
 ## Supported Minecraft servers
+### Total: 14
+
 #### Hypixel - https://hypixel.net/
 * Player information and game statistics
 * Watchdog information
@@ -29,6 +31,7 @@
 
 #### BlocksMC - https://blocksmc.com/
 * Player information and game statistics
+* Game leaderboards
 
 #### Funcraft - https://www.funcraft.net/
 * Player information and game statistics
@@ -54,3 +57,13 @@
 
 #### Universocraft - https://universocraft.com/
 * Player information and game statistics
+
+#### MunchyMC - https://www.munchymc.com/
+* Player information and game statistics
+* Gamemode leaderboards
+
+#### Minecraft Central - https://mccentral.org/
+* Player information and game statistics
+* Gamemode leaderboards
+
+
