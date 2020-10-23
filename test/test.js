@@ -1,4 +1,4 @@
-const mc = require("../app.js");
+import mc from "../src/util.js";
 
 const main = async () => {
   // mc.mccentral("kitpvp", "leaderboard").then(r => console.log(r));

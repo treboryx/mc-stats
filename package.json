@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git://github.com/treboryx/mc-stats.git"
   },
-  "main": "app.js",
+  "main": "./src/util.js",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "moment": "^2.27.0",
