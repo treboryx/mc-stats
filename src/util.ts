@@ -5,18 +5,18 @@ import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild,
 import "moment-duration-format";
 
 String.prototype.toProperCase = function () {
-  return this.replace(/([^\W_]+[^\s-]*) */g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+  return this.replace(/([^\W_]+[^\s-]*) */g, function (txt: string) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 };
 
 Object.size = (obj) => {
-  var size = 0, key;
+  var size = 0, key: any;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) size++;
   }
   return size;
 };
 
-const camelCase = (val) => {
+const camelCase = (val: string) => {
   if (val.includes(" ")) {
     const t = val.split(" ");
     const res = [];
@@ -30,14 +30,14 @@ const camelCase = (val) => {
   }
 };
 
-const convertSeconds = (seconds) => {
+const convertSeconds = (seconds: number) => {
   return (
     Math.floor(seconds / 1440) + "D " +
     Math.floor(((seconds / 1440) % 1) * 24) + "H " +
     Math.floor(((seconds / 60) % 1) * 60) + "M ");
 };
 
-export function blocksmc(query, type) {
+export function blocksmc(query: string, type: string) {
   if (type === "leaderboard") {
     return new Promise((resolve, reject) => {
       const leaderboards = ["sky-wars", "sky-wars-solo", "bed-wars", "bed-wars-solo", "egg-wars", "egg-wars-solo", "top-skypvp-s1", "survival-games", "1vs1", "the-bridge", "lucky-block-wars", "sky-giant", "sky-giant-mini", "murder-mystery", "tnt-tag", "block-party", "gravity", "super-jump", "splegg", "quake-craft", "uhc-run"];
@@ -114,7 +114,7 @@ export function blocksmc(query, type) {
     });
   }
 }
-export async function hypixelPlayer(username, key) {
+export async function hypixelPlayer(username: string, key: string) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({
@@ -127,7 +127,7 @@ export async function hypixelPlayer(username, key) {
     _hypixelPlayer(username, key).then(r => resolve(r));
   });
 }
-export async function hypixelFindGuild(search, type, key) {
+export async function hypixelFindGuild(search: any, type: any, key: any) {
   return new Promise((resolve, reject) => {
     if (!search)
       return resolve({
@@ -144,7 +144,7 @@ export async function hypixelFindGuild(search, type, key) {
     _hypixelFindGuild(search, type, key).then(r => resolve(r));
   });
 }
-export async function hypixelGuild(id, key) {
+export async function hypixelGuild(id: any, key: any) {
   return new Promise((resolve, reject) => {
     if (!id)
       return resolve({
@@ -157,7 +157,7 @@ export async function hypixelGuild(id, key) {
     _hypixelGuild(id, key).then(r => resolve(r));
   });
 }
-export async function hypixelWatchdog(key) {
+export async function hypixelWatchdog(key: any) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/watchdogstats?key=${key}`)
       .then(res => res.json())
@@ -169,7 +169,7 @@ export async function hypixelWatchdog(key) {
       });
   });
 }
-export async function hypixelBoosters(key) {
+export async function hypixelBoosters(key: any) {
   return new Promise((resolve, reject) => {
     const getGametype = {
       2: "QUAKECRAFT",
@@ -204,7 +204,7 @@ export async function hypixelBoosters(key) {
         if (!json.success)
           return resolve({ "errors": "There are no active boosters" });
         const arr = [];
-        json.boosters.forEach(async (e) => {
+        json.boosters.forEach(async (e: { gameType: string | number; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
           const entry = {
             game: getGametype[e.gameType],
             multiplier: `x${e.amount}`,
@@ -218,7 +218,7 @@ export async function hypixelBoosters(key) {
       });
   });
 }
-export async function hypixelKey(key) {
+export async function hypixelKey(key: any) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/key?key=${key}`)
       .then(res => res.json())
@@ -230,14 +230,14 @@ export async function hypixelKey(key) {
       });
   });
 }
-export function funcraft(username) {
+export function funcraft(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
     fetch(`https://www.funcraft.net/fr/joueurs?q=${username}`)
       .then(res => res.text())
       .then(body => {
-        const clean = (val) => {
+        const clean = (val: string) => {
           if (val === "classement") {
             return "ranking";
           } else if (val === "défaites") {
@@ -265,7 +265,7 @@ export function funcraft(username) {
           }
         };
 
-        const toNumber = (n) => {
+        const toNumber = (n: string) => {
           if (n.match(/[a-z]/i)) {
             return n;
           } else if (!isNaN(parseInt(n))) {
@@ -284,7 +284,7 @@ export function funcraft(username) {
         if ($("div[class='container alert-container']").text().trim().includes("× Une ou plusieurs erreurs sont survenues :"))
           return resolve({ errors: "User does not have any information" });
 
-        function formatTimeFuncraft(date) {
+        function formatTimeFuncraft(date: string | string[]) {
           date = date.split(" ");
           var day = date[0];
           var year = date[2].replace(",", "");
@@ -358,7 +358,7 @@ export function funcraft(username) {
       });
   });
 }
-export function mineplex(username) {
+export function mineplex(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -390,7 +390,7 @@ export function mineplex(username) {
       });
   });
 }
-export function manacube(username) {
+export function manacube(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -495,7 +495,7 @@ export function manacube(username) {
       });
   });
 }
-export function minesaga(username, quick) {
+export function minesaga(username: any, quick: boolean) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -543,7 +543,7 @@ export function minesaga(username, quick) {
       });
   });
 }
-export function gommehd(username) {
+export function gommehd(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -575,7 +575,7 @@ export function gommehd(username) {
       });
   });
 }
-export function timolia(username) {
+export function timolia(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -583,7 +583,7 @@ export function timolia(username) {
       .then(res => res.text())
       .then(async (body) => {
 
-        const clean = (val) => {
+        const clean = (val: string) => {
           switch (val) {
             case "Spiele gespielt":
               return "games_played";
@@ -692,7 +692,7 @@ export function timolia(username) {
           return resolve({ errors: "User not found" });
         const rank = $(".stat-column td .label").not(".label-success").not(".label-danger").text().trim().replace(/Ranked/g, "");
 
-        const calcFirstLogin = (input) => {
+        const calcFirstLogin = (input: string) => {
           var d = input.split(" ")[0];
           var t = input.split(" ")[1];
           var arr = d.split(".");
@@ -761,14 +761,14 @@ export function timolia(username) {
       });
   });
 }
-export function veltpvp(username) {
+export function veltpvp(username: any) {
   return new Promise(async (resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
     fetch(`https://www.veltpvp.com/u/${username}`)
       .then(res => res.text())
       .then(async (body) => {
-        const calcFirstLogin = (input) => {
+        const calcFirstLogin = (input: string) => {
           var arr = input.split("/");
           var final = new Date(`${arr[2]}-${arr[1]}-${arr[0]}`);
           return `${moment(final).format("MMM Do YYYY")} (${moment(final).fromNow()})`;
@@ -782,7 +782,7 @@ export function veltpvp(username) {
         let status = $("div.top").text().trim(); // offline/online/banned
         if (status.includes(" "))
           status = status.split(" ")[1].toLowerCase();
-        let seen;
+        let seen: string;
         if (status === "offline") {
           seen = $("div.bottom").text().trim().split("\n ")[0] + " " + $("div.bottom").text().trim().split("\n ")[1].trim();
         } else if (status === "online") {
@@ -809,7 +809,7 @@ export function veltpvp(username) {
       });
   });
 }
-export function universocraft(username) {
+export function universocraft(username: any) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({ "errors": "No username provided" });
@@ -820,7 +820,7 @@ export function universocraft(username) {
         const $ = load(body);
         if ($.text().trim().includes("No se ha encontrado"))
           return resolve({ errors: "User not found" });
-        const clean = (input) => {
+        const clean = (input: string) => {
           input = input.toUpperCase();
           if (input === "VICTORIAS") {
             return "wins";
@@ -915,7 +915,7 @@ export function universocraft(username) {
           if ($(this).find(".game-header-title").text().trim().toLowerCase() === "thebridge") {
             $(this).find("div.game-content").each(function () {
               const gamemode = {};
-              let gameModeName, obj;
+              let gameModeName: string, obj: { [x: number]: {}; };
 
               $(this).find("div#thebridgetotal").each(function () {
                 gameModeName = "total";
@@ -963,7 +963,7 @@ export function universocraft(username) {
       });
   });
 }
-export function hivemc(username, type) {
+export function hivemc(username: string, type: string) {
   return new Promise((resolve, reject) => {
     if (!username)
       return resolve({
@@ -993,7 +993,7 @@ export function hivemc(username, type) {
             });
           }
           body = JSON.parse(body);
-          let achievements;
+          let achievements: number;
           const rank = body.modernRank.human || 0;
           const tokens = body.tokens || 0;
           const credits = body.credits || 0;
@@ -1042,7 +1042,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const games_played = body.games_played || 0;
           const total_kills = body.total_eliminations || 0;
           const total_placing = body.total_placing || 0;
@@ -1065,7 +1065,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const captured = body.captured || 0;
           const captures = body.captures || 0;
@@ -1091,7 +1091,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const kills = body.kills || 0;
@@ -1121,7 +1121,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const kills = body.kills || 0;
@@ -1152,7 +1152,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const captures = body.captures || 0;
           const kills = body.kills || 0;
           const deaths = body.deaths || 0;
@@ -1176,7 +1176,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const kills = body.kills || 0;
@@ -1205,7 +1205,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const hider_kills = body.hiderkills || 0;
@@ -1233,7 +1233,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const kills = body.kills || 0;
@@ -1259,7 +1259,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const victories = body.victories || 0;
           const games_played = body.gamesplayed || 0;
           const eggs_fired = body.eggsfired || 0;
@@ -1286,7 +1286,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const most_points = body.most_points || 0;
           const role_points = body.role_points || 0;
@@ -1335,7 +1335,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const games_played = body.gamesplayed || 0;
@@ -1441,7 +1441,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const victories = body.victories || 0;
           const tables_cleared = body.tablescleared || 0;
           const games_played = body.gamesplayed || 0;
@@ -1529,7 +1529,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const games_played = body.games_played || 0;
@@ -1537,26 +1537,26 @@ export function hivemc(username, type) {
           const deaths = body.deaths || 0;
           const blocks_painted = body.blocks_painted || 0;
           const ultimates_earned = body.ultimates_earned;
-          var booster_blocks_painted;
-          var booster_kills;
-          var booster_deaths;
-          var booster_ulimate_kills;
-          var booster_games_played;
-          var raven_blocks_painted;
-          var raven_kills;
-          var raven_deaths;
-          var raven_ulimate_kills;
-          var raven_games_played;
-          var torstein_blocks_painted;
-          var torstein_kills;
-          var torstein_deaths;
-          var torstein_ulimate_kills;
-          var torstein_games_played;
-          var oinky_blocks_painted;
-          var oinky_kills;
-          var oinky_deaths;
-          var oinky_ulimate_kills;
-          var oinky_games_played;
+          var booster_blocks_painted: any;
+          var booster_kills: any;
+          var booster_deaths: any;
+          var booster_ulimate_kills: any;
+          var booster_games_played: any;
+          var raven_blocks_painted: any;
+          var raven_kills: any;
+          var raven_deaths: any;
+          var raven_ulimate_kills: any;
+          var raven_games_played: any;
+          var torstein_blocks_painted: any;
+          var torstein_kills: any;
+          var torstein_deaths: any;
+          var torstein_ulimate_kills: any;
+          var torstein_games_played: any;
+          var oinky_blocks_painted: any;
+          var oinky_kills: any;
+          var oinky_deaths: any;
+          var oinky_ulimate_kills: any;
+          var oinky_games_played: any;
 
           if (body.character_stats) {
             if (body.character_stats.BoosterCharacter) {
@@ -1607,7 +1607,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const games_played = body.games_played || 0;
           const victories = body.victories || 0;
@@ -1632,7 +1632,7 @@ export function hivemc(username, type) {
           body = JSON.parse(body);
           if (body.code === 404 && body.short === "noprofile")
             return resolve({ errors: `No ${type} data found for user: ${username}` });
-          let achievements;
+          let achievements: number;
           const total_points = body.total_points || 0;
           const victories = body.victories || 0;
           const games_played = body.games_played || 0;
@@ -1664,7 +1664,7 @@ export function hivemc(username, type) {
     }
   });
 }
-export function wynncraft(type, name) {
+export function wynncraft(type: string, name: any) {
   return new Promise((resolve, reject) => {
     if (!name)
       return resolve({
@@ -1714,7 +1714,7 @@ export function wynncraft(type, name) {
           const events_won = player.global.eventsWon || 0;
 
           if (player.classes) {
-            player.classes.forEach(async (i) => {
+            player.classes.forEach(async (i: { name: string; level: number; chestsFound: number; itemsIdentified: number; mobsKilled: number; pvp: { kills: number; deaths: number; }; blocksWalked: number; logins: number; deaths: number; playtime: moment.DurationInputArg1; discoveries: number; eventsWon: number; gamemode: string; skills: { strength: number; dexterity: number; intelligence: number; defence: number; agility: number; }; professions: { alchemism: number; armouring: number; combat: number; cooking: number; farming: number; fishing: number; jeweling: number; mining: number; scribing: number; tailoring: number; weaponsmithing: number; woodcutting: number; woodworking: number; }; dungeons: { completed: number; list: any[]; }; quests: { completed: number; list: string; }; }) => {
               const name = i.name.replace(/[0-9]+/g, "") || "None";
               const level = i.level || 0;
               const chests_found = i.chestsFound || 0;
@@ -1751,7 +1751,7 @@ export function wynncraft(type, name) {
               var dungeons = [];
               const quests_completed = i.quests.completed || 0;
               const quests = i.quests.list || "None";
-              i.dungeons.list.forEach(dungeon => {
+              i.dungeons.list.forEach((dungeon: { name: any; completed: any; }) => {
                 dungeons.push({
                   name: dungeon.name,
                   completed: dungeon.completed
@@ -1809,11 +1809,11 @@ export function wynncraft(type, name) {
           const banner = body.banner ? body.banner : null;
           if (body.members) {
             const members = body.members.length;
-            const guild_owner = body.members.filter(guild => guild.rank == "OWNER");
-            const guild_chief = body.members.filter(guild => guild.rank == "CHIEF");
-            const guild_recruit = body.members.filter(guild => guild.rank == "RECRUIT");
-            const guild_captain = body.members.filter(guild => guild.rank == "CAPTAIN");
-            const guild_recruiter = body.members.filter(guild => guild.rank == "RECRUITER");
+            const guild_owner = body.members.filter((guild: { rank: string; }) => guild.rank == "OWNER");
+            const guild_chief = body.members.filter((guild: { rank: string; }) => guild.rank == "CHIEF");
+            const guild_recruit = body.members.filter((guild: { rank: string; }) => guild.rank == "RECRUIT");
+            const guild_captain = body.members.filter((guild: { rank: string; }) => guild.rank == "CAPTAIN");
+            const guild_recruiter = body.members.filter((guild: { rank: string; }) => guild.rank == "RECRUITER");
             Object.assign(data, { members, guild_owner, guild_chief, guild_recruit, guild_captain, guild_recruiter });
           }
           Object.assign(data, { name, prefix, xp, level, created, territories, banner });
@@ -1822,7 +1822,7 @@ export function wynncraft(type, name) {
     }
   });
 }
-export function munchymc(query, type) {
+export function munchymc(query: any, type: string) {
   if (type === "leaderboard") {
     return new Promise((resolve, reject) => {
       fetch(`https://www.munchymc.com/leaderboards/${query}`)
@@ -1940,10 +1940,10 @@ export function munchymc(query, type) {
     });
   }
 }
-export function mccentral(query, type) {
+export function mccentral(query: string, type: string) {
   if (type === "leaderboard") {
     return new Promise((resolve, reject) => {
-      function mccentralLeaderboardName(leaderboard) {
+      function mccentralLeaderboardName(leaderboard: any) {
         switch (leaderboard) {
           case "survivalgames":
             return "fsurvival";
@@ -1987,7 +1987,7 @@ export function mccentral(query, type) {
         .then(body => {
           const data = [];
           if (body.aaData.length > 0) {
-            body.aaData.forEach(i => {
+            body.aaData.forEach((i: any[]) => {
               if (leaderboardName === "fsurvival") {
                 data.push({
                   username: i[1],

@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 
-function parkourTime (time) {
+function parkourTime (time: number) {
   time = time / 1000;
   const minutes = Math.floor(time / 60);
   const seconds = time - minutes * 60;
@@ -13,7 +13,7 @@ function parkourTime (time) {
   }
 }
 
-export async function hypixelPlayer(username, key) {
+export async function hypixelPlayer(username: string, key: string) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/player?key=${key}&name=${username}`)
       .then(res => res.json())
@@ -111,7 +111,7 @@ export async function hypixelPlayer(username, key) {
             parkour_completions[i] = {
               time: parkourTime(
                 Math.min(
-                  ...player.parkourCompletions[i].map((value) => value.timeTook)
+                  ...player.parkourCompletions[i].map((value: { timeTook: any; }) => value.timeTook)
                 )
               ),
               attempts: Object.keys(player.parkourCompletions[i]).length,
@@ -1820,7 +1820,7 @@ export async function hypixelPlayer(username, key) {
       });
   });
 }
-export async function hypixelFindGuild(search, type, key) {
+export async function hypixelFindGuild(search: any, type: string, key: any) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/findGuild?key=${key}&by${type === "uuid" ? "Uuid" : "Name"}=${search}`)
       .then(res => res.json())
@@ -1834,7 +1834,7 @@ export async function hypixelFindGuild(search, type, key) {
       });
   });
 }
-export async function hypixelGuild(id, key) {
+export async function hypixelGuild(id: any, key: any) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/guild?key=${key}&id=${id}`)
       .then(res => res.json())
