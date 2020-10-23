@@ -399,7 +399,13 @@ export function manacube(username: string) {
       .then(json => {
         if (json.exists === false)
           return resolve({ "errors": "User does not have any information" });
-        const data = { games: {} };
+        interface Data1{
+          [key: string]: object
+        }
+          interface Data {
+          "games": Data1
+        }
+        const data: Data = { games: {} };
         Object.assign(data, {
           name: username,
           level: json.level ? json.level : 0,
@@ -816,7 +822,13 @@ export function universocraft(username: string) {
     fetch(`https://stats.universocraft.com/stats.php?player=${username}`)
       .then(res => res.text())
       .then(async (body) => {
-        const data = { games: {} };
+        interface Data1{
+          [key: string]: object
+        }
+        interface Data {
+          "games": Data1
+        }
+        const data: Data = { games: {} };
         const $ = load(body);
         if ($.text().trim().includes("No se ha encontrado"))
           return resolve({ errors: "User not found" });
