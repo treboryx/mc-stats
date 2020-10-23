@@ -1820,7 +1820,7 @@ export async function hypixelPlayer(username: string, key: string) {
       });
   });
 }
-export async function hypixelFindGuild(search: any, type: string, key: any) {
+export async function hypixelFindGuild(search: string, type: string, key: string) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/findGuild?key=${key}&by${type === "uuid" ? "Uuid" : "Name"}=${search}`)
       .then(res => res.json())
@@ -1834,7 +1834,7 @@ export async function hypixelFindGuild(search: any, type: string, key: any) {
       });
   });
 }
-export async function hypixelGuild(id: any, key: any) {
+export async function hypixelGuild(id: any, key: string) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.hypixel.net/guild?key=${key}&id=${id}`)
       .then(res => res.json())

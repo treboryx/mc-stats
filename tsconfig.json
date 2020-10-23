@@ -3,10 +3,14 @@
       "outDir": "./built",
       "allowJs": true,
       "target": "es6",
-      "sourceMap": true
+      "sourceMap": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true
     },
     "include": ["./src/**/*"],
     "exclude": [
       "node_modules"
-  ]
+    ]
   }
