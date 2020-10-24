@@ -1,5 +1,5 @@
 import fetch from "node-fetch"; // Main http module
-import { load } from "cheerio";
+const cheerio = require("cheerio");
 import moment, { duration as _duration, unix } from "moment";
 import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild, hypixelGuild as _hypixelGuild } from "./hypixel";
 import "moment-duration-format";
@@ -51,7 +51,7 @@ export function blocksmc(query: string, type: string) {
         }
           const data: Obj[] = [];
           const template: (string | number)[] = [];
-          const $ = load(body);
+          const $ = cheerio.load(body);
           $("thead").find("td").each(function () {
             const stat = $(this).text().trim().replace(/\s\s|^Av$/g, "").toLowerCase().replace("#", "rank").replace("w/l", "winLossRatio").replace("k/d", "killDeathRatio");
             if (stat.length > 0)
@@ -84,7 +84,7 @@ export function blocksmc(query: string, type: string) {
             games: Data1
           }
           const data: Data = { games: {} };
-          const $ = load(body);
+          const $ = cheerio.load(body);
           const name = $(".profile-header h1").text().trim();
           const rank = $(".profile-rank").text().replace("\n", "").trim();
           const timePlayed = $("h1[dir=ltr]").text().replace("\n", "").trim();
@@ -180,7 +180,10 @@ export async function hypixelWatchdog(key: string) {
 }
 export async function hypixelBoosters(key: string) {
   return new Promise((resolve, reject) => {
-    const getGametype = {
+    interface Game {
+      [key: string]: string
+    }
+    const getGametype: Game = {
       2: "QUAKECRAFT",
       3: "WALLS",
       4: "PAINTBALL",
@@ -212,8 +215,8 @@ export async function hypixelBoosters(key: string) {
       .then(async (json) => {
         if (!json.success)
           return resolve({ "errors": "There are no active boosters" });
-        const arr: unknown = [];
-        json.boosters.forEach(async (e: { gameType: string | number; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
+        const arr: object[] = [];
+        json.boosters.forEach(async (e: { gameType: string; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
           const entry = {
             game: getGametype[e.gameType],
             multiplier: `x${e.amount}`,
@@ -287,14 +290,19 @@ export function funcraft(username: string) {
             return n;
           }
         };
-
-        const data = { games: {} };
-        const $ = load(body);
+        interface Data1{
+          [key: string]: object
+        }
+          interface Data {
+          "games": Data1
+        }
+        const data: Data = { games: {} };
+        const $ = cheerio.load(body);
         if ($("div[class='container alert-container']").text().trim().includes("× Une ou plusieurs erreurs sont survenues :"))
           return resolve({ errors: "User does not have any information" });
 
-        function formatTimeFuncraft(date: string | string[]) {
-          date = date.split(" ");
+        function formatTimeFuncraft(_date: string) {
+          const date = _date.split(" ");
           var day = date[0];
           var year = date[2].replace(",", "");
           var time = date[3].replace("h", ":");
@@ -354,7 +362,7 @@ export function funcraft(username: string) {
           const stats = {};
 
           $(this).find("div.stats-entry").each(function () {
-            Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: Number(toNumber(clean($(this).find("div.stats-value-daily").text().trim())).replace(/-/g, 0).replace(/h|m|,| /g, "")) });
+            Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: Number(toNumber(clean($(this).find("div.stats-value-daily").text().trim()))?.replace(/-/g, "0")?.replace(/h|m|,| /g, "")) });
           });
           if (Object.size(stats)) {
             data.games[$(this).find("div.name").text().trim().replace("Infecté", "Infected")] = stats;
@@ -375,7 +383,7 @@ export function mineplex(username: string) {
       .then(res => res.text())
       .then(body => {
         const data = { games: [] };
-        const $ = load(body);
+        const $ = cheerio.load(body);
         const name = $(".www-mp-username").text().trim();
         const rank = $("span[class=\"www-mp-rank\"]").text().trim();
         const gamesPlayed = $("div[class='lbl lbl-me']").text().trim().split(" ")[0];
@@ -517,9 +525,15 @@ export function minesaga(username: string, quick: boolean) {
     fetch(`https://www.minesaga.org/player/${username}`)
       .then(res => res.text())
       .then(async (body) => {
-        const data = { games: {} };
+        interface Data1 {
+          [key: string]: object
+        }
+        interface Data {
+          games: Data1
+        }
+        const data: Data = { games: {} };
 
-        const $ = load(body);
+        const $ = cheerio.load(body);
         if ($.text().trim().includes("User not found"))
           return resolve({ errors: "User not found" });
         const name = $(".dd-profile-details h2").text().trim().split(" ")[0];
@@ -539,7 +553,7 @@ export function minesaga(username: string, quick: boolean) {
           const game = games[i].replace(/\s\s/g, "");
           if (game.length > 0) {
             const d = await fetch(`https://www.minesaga.org/player/${username}/${game}`).then(res => res.text());
-            const $ = load(d);
+            const $ = cheerio.load(d);
             const stats = {};
             $("div.dd-section").each(function () {
               $(this).find("div.dd-stats").each(function () {
@@ -565,8 +579,11 @@ export function gommehd(username: string) {
     fetch(`https://www.gommehd.net/player/index?playerName=${username}`)
       .then(res => res.text())
       .then(async (body) => {
-        var data = { games: [] };
-        const $ = load(body);
+        interface Data {
+          games: object[]
+        }
+        var data: Data = { games: [] };
+        const $ = cheerio.load(body);
         if ($.text().trim().includes("User not found"))
           return resolve({ "errors": "User not found" });
         const name = $("div.user_info").text().trim().split(" ")[0];
@@ -698,9 +715,18 @@ export function timolia(username: string) {
               return val.toLowerCase();
           }
         };
-
-        const data = { totalWins: 0, totalKills: 0, totalDeaths: 0, totalGamesPlayed: 0, games: {} };
-        const $ = load(body);
+        interface Data1 {
+          [key: string]: any
+        }
+        interface Data {
+          totalWins: number, 
+          totalKills: number, 
+          totalDeaths: number, 
+          totalGamesPlayed: number, 
+          games: Data1
+        }
+        const data: Data = { totalWins: 0, totalKills: 0, totalDeaths: 0, totalGamesPlayed: 0, games: {} };
+        const $ = cheerio.load(body);
 
         const name = $("h2#playername").text().trim();
         if (!name)
@@ -738,7 +764,7 @@ export function timolia(username: string) {
               }
               $(this).find(".stats-table-field").each(function () {
                 const objName = clean($(this).find("td").not(".align-right").text());
-                let objValue = $(this).find("td").last().text().replace("Sek.", "Seconds");
+                let objValue = Number($(this).find("td").last().text().replace("Sek.", "Seconds"));
                 if (!isNaN(objValue))
                   objValue = Number(objValue);
                 if (objName === "games_played")
@@ -788,9 +814,14 @@ export function veltpvp(username: string) {
           var final = new Date(`${arr[2]}-${arr[1]}-${arr[0]}`);
           return `${moment(final).format("MMM Do YYYY")} (${moment(final).fromNow()})`;
         };
-
-        const data = { games: {} };
-        const $ = load(body);
+        interface Data1 {
+          [key: string]: object
+        }
+        interface Data {
+          games: Data1
+        }
+        const data: Data = { games: {} };
+        const $ = cheerio.load(body);
         if ($.text().trim().includes("not found"))
           return resolve({ errors: "User not found" });
         const name = $("h1#name").text().trim();
@@ -802,6 +833,8 @@ export function veltpvp(username: string) {
           seen = $("div.bottom").text().trim().split("\n ")[0] + " " + $("div.bottom").text().trim().split("\n ")[1].trim();
         } else if (status === "online") {
           seen = $("div.bottom").text().trim();
+        } else {
+          seen = "";
         }
         const rank = $("div#profile h2").text().trim();
         const firstLogin = calcFirstLogin($("div.content strong").text().trim().substring(0, 10));
@@ -838,8 +871,8 @@ export function universocraft(username: string) {
           "games": Data1
         }
         const data: Data = { games: {} };
-        const $ = load(body);
-        if ($.text().trim().includes("No se ha encontrado"))
+        const $ = cheerio.load(body);
+        if ($.text().text().trim().includes("No se ha encontrado"))
           return resolve({ errors: "User not found" });
         const clean = (input: string) => {
           input = input.toUpperCase();
@@ -1863,7 +1896,7 @@ export function munchymc(query: string, type: string) {
               [key: string]: Leaderboard[]
           }
           const data: Data = {};
-          const $ = load(body);
+          const $ = cheerio.load(body);
 
           $($("div.col-md-4").length > 0 ? "div.col-md-4" : "div.col-md-6").each(function () {
             const leaderboard = $(this).find("div.caption-stats").text().trim().replace(/ /g, "");
@@ -1888,7 +1921,7 @@ export function munchymc(query: string, type: string) {
         .then(body => {
 
           // const data: object = { games: {} };
-          const $ = load(body);
+          const $ = cheerio.load(body);
           if ($("div.col-md-12").text().includes("Looks like we couldn't find that name in our database!")) {
             return resolve({
               "errors": `No inforamtion was found for ${query}`
