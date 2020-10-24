@@ -1,0 +1,14 @@
+import "moment-duration-format";
+export declare function blocksmc(query: string, type: string): Promise<unknown> | undefined;
+export declare function funcraft(username: string): Promise<unknown>;
+export declare function mineplex(username: string): Promise<unknown>;
+export declare function manacube(username: string): Promise<unknown>;
+export declare function minesaga(username: string, quick: boolean): Promise<unknown>;
+export declare function gommehd(username: string): Promise<unknown>;
+export declare function timolia(username: string): Promise<unknown>;
+export declare function veltpvp(username: string): Promise<unknown>;
+export declare function universocraft(username: string): Promise<unknown>;
+export declare function hivemc(username: string, type: string): Promise<unknown>;
+export declare function wynncraft(type: string, name: string): Promise<unknown>;
+export declare function munchymc(query: string, type: string): Promise<unknown> | undefined;
+export declare function mccentral(query: string, type: string): Promise<unknown> | undefined;
