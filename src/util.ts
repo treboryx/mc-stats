@@ -46,7 +46,10 @@ export function blocksmc(query: string, type: string) {
       fetch(`https://blocksmc.com/${query}`)
         .then(res => res.text())
         .then(body => {
-          const data: unknown = [];
+          interface Obj {
+            [key: string]: number | string
+        }
+          const data: Obj[] = [];
           const template: (string | number)[] = [];
           const $ = load(body);
           $("thead").find("td").each(function () {
@@ -56,9 +59,9 @@ export function blocksmc(query: string, type: string) {
           });
           $("tbody").find("tr").each(function () {
             const stat = $(this).text().trim().replace(/\s\s/g, "").split(" ");
-            const obj = {};
+            const obj: Obj = {};
             for (let i = 0; i < template.length; i++) {
-              obj[template[i]] = !isNaN(stat[i]) ? Number(stat[i]) : stat[i];
+              obj[String(template[i])] = !isNaN(Number(stat[i])) ? Number(stat[i]) : stat[i];
             }
             data.push(obj);
           });
@@ -74,7 +77,13 @@ export function blocksmc(query: string, type: string) {
       fetch(`https://blocksmc.com/player/${query}`)
         .then(res => res.text())
         .then(body => {
-          const data = { games: {} };
+          interface Data1 {
+            [key: string]: object
+          }
+          interface Data {
+            games: Data1
+          }
+          const data: Data = { games: {} };
           const $ = load(body);
           const name = $(".profile-header h1").text().trim();
           const rank = $(".profile-rank").text().replace("\n", "").trim();
