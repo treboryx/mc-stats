@@ -1,5 +1,11 @@
 import "moment-duration-format";
 export declare function blocksmc(query: string, type: string): Promise<unknown> | undefined;
+export declare function hypixelPlayer(username: string, key: string): Promise<unknown>;
+export declare function hypixelFindGuild(search: string, type: string, key: string): Promise<unknown>;
+export declare function hypixelGuild(id: string, key: string): Promise<unknown>;
+export declare function hypixelWatchdog(key: string): Promise<unknown>;
+export declare function hypixelBoosters(key: string): Promise<unknown>;
+export declare function hypixelKey(key: string): Promise<unknown>;
 export declare function funcraft(username: string): Promise<unknown>;
 export declare function mineplex(username: string): Promise<unknown>;
 export declare function manacube(username: string): Promise<unknown>;
