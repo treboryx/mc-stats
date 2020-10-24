@@ -1,72 +1,35 @@
+
 {
-  "parserOptions": {
-    "ecmaVersion": 2017,
-    "sourceType": "module"
-  },
-  "env": {
-    "es6": true,
-    "node": true
-  },
-  "extends": "eslint:recommended",
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": "./tsconfig.json" },
+  "env": { "es6": true },
+  "ignorePatterns": ["node_modules", "build", "coverage"],
+  "plugins": ["import", "eslint-comments", "functional"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:eslint-comments/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "plugin:functional/lite",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
+  "globals": { "BigInt": true, "console": true, "WebAssembly": true },
   "rules": {
-    "no-console": "off",
-    "indent": [
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "eslint-comments/disable-enable-pair": [
       "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
+      { "allowWholeFile": true }
     ],
-    "linebreak-style": [
+    "eslint-comments/no-unused-disable": "error",
+    "import/order": [
       "error",
-      "windows"
+      { "newlines-between": "always", "alphabetize": { "order": "asc" } }
     ],
-    "quotes": [
-      "warn",
-      "double"
-    ],
-    "semi": [
-      "warn",
-      "always"
-    ],
-    "keyword-spacing": [
+    "sort-imports": [
       "error",
-      {
-        "before": true,
-        "after": true
-      }
-    ],
-    "space-before-blocks": [
-      "error",
-      {
-        "functions": "always",
-        "keywords": "always",
-        "classes": "always"
-      }
-    ],
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "always",
-        "named": "always",
-        "asyncArrow": "always"
-      }
-    ],
-    "prefer-const": [
-      "error",
-      {
-        "destructuring": "any",
-        "ignoreReadBeforeAssign": false
-      }
-    ],
-    "no-unused-vars": [
-      "off"
-    ],
-    "no-prototype-builtins": [
-      "off"
-    ],
-    "no-async-promise-executor": [
-      "off"
+      { "ignoreDeclarationSort": true, "ignoreCase": true }
     ]
   }
 }

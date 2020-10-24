@@ -1,8 +1,13 @@
 {
-  "type": "module",
   "name": "mc-stats",
   "version": "1.0.7",
   "description": "Wrapper for fetching player stats from popular Minecraft networks.",
+  "bin": {
+    "typescript-starter": "./bin/typescript-starter"
+  },
+  "main": "build/main/index.js",
+  "typings": "build/main/index.d.ts",
+  "module": "build/module/index.js",
   "author": "Robert (Discord: Robert#0006), Tj (Discord: Tj#0215)",
   "license": "MIT",
   "keywords": [
@@ -17,31 +22,138 @@
     "type": "git",
     "url": "git://github.com/treboryx/mc-stats.git"
   },
-  "main": "./built/index.js",
-  "types": "./built/index.d.ts",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "moment": "^2.27.0",
     "moment-duration-format": "^2.3.2",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "@bitauth/libauth": "^1.17.1",
+    "chalk": "^4.1.0",
+    "del": "^5.0.0",
+    "execa": "^4.0.3",
+    "github-username": "^5.0.1",
+    "globby": "^11.0.1",
+    "gradient-string": "^1.2.0",
+    "inquirer": "^7.3.3",
+    "meow": "^7.1.1",
+    "ora": "^5.0.0",
+    "replace-in-file": "^6.1.0",
+    "update-notifier": "^4.1.1",
+    "validate-npm-package-name": "^3.0.0"
   },
   "devDependencies": {
+    "@ava/typescript": "^1.1.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/cheerio": "^0.22.22",
+    "@types/gradient-string": "^1.1.1",
+    "@types/inquirer": "^7.3.1",
+    "@types/md5-file": "^4.0.2",
     "@types/moment-duration-format": "^2.2.2",
+    "@types/node": "^14.14.2",
     "@types/node-fetch": "^2.5.7",
-    "eslint": "^6.8.0",
-    "husky": "^4.2.5",
-    "jest": "^24.9.0",
-    "typescript": "^4.0.3"
+    "@types/update-notifier": "^4.1.1",
+    "@types/validate-npm-package-name": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "ava": "^3.12.1",
+    "codecov": "^3.5.0",
+    "cspell": "^4.1.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-functional": "^3.0.2",
+    "eslint-plugin-import": "^2.22.0",
+    "gh-pages": "^3.1.0",
+    "md5-file": "^5.0.0",
+    "nock": "^13.0.4",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
+    "open-cli": "^6.0.1",
+    "prettier": "^2.1.1",
+    "standard-version": "^9.0.0",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.19.0",
+    "typescript": "^4.0.2"
   },
   "scripts": {
-    "lint": "eslint --fix .",
-    "dev": "node ./test/test.js",
-    "tsc:w": "tsc -w"
+    "build": "run-p build:*",
+    "build:main": "tsc -p tsconfig.json",
+    "build:module": "tsc -p tsconfig.module.json",
+    "fix": "run-s fix:*",
+    "fix:prettier": "prettier \"src/**/*.ts\" --write",
+    "fix:lint": "eslint src --ext .ts --fix",
+    "test": "run-s build test:*",
+    "test:lint": "eslint src --ext .ts",
+    "test:prettier": "prettier \"src/**/*.ts\" --list-different",
+    "test:spelling": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
+    "test:unit": "nyc --silent ava",
+    "check-cli": "run-s test diff-integration-tests check-integration-tests",
+    "check-integration-tests": "run-s check-integration-test:*",
+    "check-integration-test:1": "cd test/test-1 && npm i && npm run build && npm run test",
+    "check-integration-test:2": "cd test/test-2 && yarn && yarn build && yarn test",
+    "check-integration-test:3": "cd test/test-3 && yarn && yarn build && yarn test",
+    "check-integration-test:4": "cd test/test-4 && npm i && npm run build && npm run test",
+    "check-integration-test:5": "cd test/test-5 && npm i && npm run build && npm run test",
+    "check-integration-test:6": "cd test/test-6 && yarn && yarn build && yarn test",
+    "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
+    "watch:build": "tsc -p tsconfig.json -w",
+    "watch:test": "nyc --silent ava --watch",
+    "cov": "run-s build test:unit cov:html cov:lcov && open-cli coverage/index.html",
+    "cov:html": "nyc report --reporter=html",
+    "cov:lcov": "nyc report --reporter=lcov",
+    "cov:send": "run-s cov:lcov && codecov",
+    "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
+    "doc": "run-s doc:html && open-cli build/docs/index.html",
+    "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
+    "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
+    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
+    "version": "standard-version",
+    "reset-hard": "git clean -dfx && git reset --hard && npm i",
+    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "build/main",
+    "build/module",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "ava": {
+    "failFast": true,
+    "timeout": "60s",
+    "typescript": {
+      "rewritePaths": {
+        "src/": "build/main/"
+      }
+    },
+    "files": [
+      "!diff",
+      "!test",
+      "!build/module/**"
+    ],
+    "ignoredByWatcher": [
+      "diff",
+      "test"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
     }
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "exclude": [
+      "**/*.spec.js"
+    ]
   }
 }
