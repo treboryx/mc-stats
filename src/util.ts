@@ -1,14 +1,13 @@
 import fetch from "node-fetch"; // Main http module
-const cheerio = require("cheerio");
+import cheerio from "cheerio";
 import moment, { duration as _duration, unix } from "moment";
-import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild, hypixelGuild as _hypixelGuild } from "./hypixel";
+// import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild, hypixelGuild as _hypixelGuild } from "./hypixel";
 import "moment-duration-format";
-
-String.prototype.toProperCase = function () {
-  return this.replace(/([^\W_]+[^\s-]*) */g, function (txt: string) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+function toProperCase(str: string) {
+  return str.replace(/([^\W_]+[^\s-]*) */g, function (txt: string) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 };
 
-Object.size = (obj: { hasOwnProperty: (arg0: any) => any; }) => {
+function size (obj: object){
   var size = 0, key: any;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) size++;
@@ -22,7 +21,7 @@ const camelCase = (val: string) => {
     const res = [];
     res.push(t[0]);
     for (let k = 1; t.length > k; k++) {
-      res.push(t[k].toProperCase());
+      res.push(toProperCase(t[k]));
     }
     return res.join("");
   } else {
@@ -123,125 +122,125 @@ export function blocksmc(query: string, type: string) {
     });
   }
 }
-export async function hypixelPlayer(username: string, key: string) {
-  return new Promise((resolve, reject) => {
-    if (!username)
-      return resolve({
-        "errors": "No username provided"
-      });
-    if (!key)
-      return resolve({
-        "errors": "No Hypixel API key provided"
-      });
-    _hypixelPlayer(username, key).then(r => resolve(r));
-  });
-}
-export async function hypixelFindGuild(search: string, type: string, key: string) {
-  return new Promise((resolve, reject) => {
-    if (!search)
-      return resolve({
-        "errors": "No search term provided"
-      });
-    if (!type)
-      return resolve({
-        "errors": "No search type provided"
-      });
-    if (!key)
-      return resolve({
-        "errors": "No Hypixel API key provided"
-      });
-    _hypixelFindGuild(search, type, key).then(r => resolve(r));
-  });
-}
-export async function hypixelGuild(id: string, key: string) {
-  return new Promise((resolve, reject) => {
-    if (!id)
-      return resolve({
-        "errors": "No guild ID provided"
-      });
-    if (!key)
-      return resolve({
-        "errors": "No Hypixel API key provided"
-      });
-    _hypixelGuild(id, key).then(r => resolve(r));
-  });
-}
-export async function hypixelWatchdog(key: string) {
-  return new Promise((resolve, reject) => {
-    fetch(`https://api.hypixel.net/watchdogstats?key=${key}`)
-      .then(res => res.json())
-      .then(async (json) => {
-        resolve(json);
-      }).catch(e => {
-        resolve({ "errors": "Can't fetch stats, API is probably offline." });
-        console.log(e);
-      });
-  });
-}
-export async function hypixelBoosters(key: string) {
-  return new Promise((resolve, reject) => {
-    interface Game {
-      [key: string]: string
-    }
-    const getGametype: Game = {
-      2: "QUAKECRAFT",
-      3: "WALLS",
-      4: "PAINTBALL",
-      5: "Blitz Survival Games",
-      6: "TNT GAMES",
-      7: "VAMPIREZ",
-      13: "Mega Walls",
-      14: "ARCADE",
-      17: "ARENA",
-      20: "UHC Champions",
-      21: "Cops and Crims",
-      23: "Warlords",
-      24: "Smash Heroes",
-      25: "Turbo Kart Racers",
-      26: "Housing",
-      51: "SkyWars",
-      52: "Crazy Walls",
-      54: "Speed UHC",
-      55: "SkyClash",
-      56: "Classic Games",
-      57: "Prototype",
-      58: "Bed Wars",
-      59: "Murder Mystery",
-      60: "Build Battle",
-      61: "Duels",
-    };
-    fetch(`https://api.hypixel.net/boosters?key=${key}`)
-      .then(res => res.json())
-      .then(async (json) => {
-        if (!json.success)
-          return resolve({ "errors": "There are no active boosters" });
-        const arr: object[] = [];
-        json.boosters.forEach(async (e: { gameType: string; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
-          const entry = {
-            game: getGametype[e.gameType],
-            multiplier: `x${e.amount}`,
-            remaining: _duration(e.length, "seconds").format(" m [mins], s [secs]"),
-            originalLength: _duration(e.originalLength, "seconds").format(" m [mins], s [secs]"),
-            activated: e.dateActivated
-          };
-          arr.push(entry);
-        });
-        resolve(arr);
-      });
-  });
-}
-export async function hypixelKey(key: string) {
-  return new Promise((resolve, reject) => {
-    fetch(`https://api.hypixel.net/key?key=${key}`)
-      .then(res => res.json())
-      .then(async (json) => {
-        resolve(json);
-      }).catch(e => {
-        resolve({ "errors": "Can't fetch stats, API is probably offline." });
-        console.log(e);
-      });
-  });
-}
+// export async function hypixelPlayer(username: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!username)
+//       return resolve({
+//         "errors": "No username provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelPlayer(username, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelFindGuild(search: string, type: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!search)
+//       return resolve({
+//         "errors": "No search term provided"
+//       });
+//     if (!type)
+//       return resolve({
+//         "errors": "No search type provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelFindGuild(search, type, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelGuild(id: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!id)
+//       return resolve({
+//         "errors": "No guild ID provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelGuild(id, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelWatchdog(key: string) {
+//   return new Promise((resolve, reject) => {
+//     fetch(`https://api.hypixel.net/watchdogstats?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         resolve(json);
+//       }).catch(e => {
+//         resolve({ "errors": "Can't fetch stats, API is probably offline." });
+//         console.log(e);
+//       });
+//   });
+// }
+// export async function hypixelBoosters(key: string) {
+//   return new Promise((resolve, reject) => {
+//     interface Game {
+//       [key: string]: string
+//     }
+//     const getGametype: Game = {
+//       2: "QUAKECRAFT",
+//       3: "WALLS",
+//       4: "PAINTBALL",
+//       5: "Blitz Survival Games",
+//       6: "TNT GAMES",
+//       7: "VAMPIREZ",
+//       13: "Mega Walls",
+//       14: "ARCADE",
+//       17: "ARENA",
+//       20: "UHC Champions",
+//       21: "Cops and Crims",
+//       23: "Warlords",
+//       24: "Smash Heroes",
+//       25: "Turbo Kart Racers",
+//       26: "Housing",
+//       51: "SkyWars",
+//       52: "Crazy Walls",
+//       54: "Speed UHC",
+//       55: "SkyClash",
+//       56: "Classic Games",
+//       57: "Prototype",
+//       58: "Bed Wars",
+//       59: "Murder Mystery",
+//       60: "Build Battle",
+//       61: "Duels",
+//     };
+//     fetch(`https://api.hypixel.net/boosters?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         if (!json.success)
+//           return resolve({ "errors": "There are no active boosters" });
+//         const arr: object[] = [];
+//         json.boosters.forEach(async (e: { gameType: string; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
+//           const entry = {
+//             game: getGametype[e.gameType],
+//             multiplier: `x${e.amount}`,
+//             remaining: _duration(e.length, "seconds").format(" m [mins], s [secs]"),
+//             originalLength: _duration(e.originalLength, "seconds").format(" m [mins], s [secs]"),
+//             activated: e.dateActivated
+//           };
+//           arr.push(entry);
+//         });
+//         resolve(arr);
+//       });
+//   });
+// }
+// export async function hypixelKey(key: string) {
+//   return new Promise((resolve, reject) => {
+//     fetch(`https://api.hypixel.net/key?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         resolve(json);
+//       }).catch(e => {
+//         resolve({ "errors": "Can't fetch stats, API is probably offline." });
+//         console.log(e);
+//       });
+//   });
+// }
 export function funcraft(username: string) {
   return new Promise((resolve, reject) => {
     if (!username)
@@ -364,7 +363,7 @@ export function funcraft(username: string) {
           $(this).find("div.stats-entry").each(function () {
             Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: Number(toNumber(clean($(this).find("div.stats-value-daily").text().trim()))?.replace(/-/g, "0")?.replace(/h|m|,| /g, "")) });
           });
-          if (Object.size(stats)) {
+          if (size(stats)) {
             data.games[$(this).find("div.name").text().trim().replace("Infecté", "Infected")] = stats;
           }
         });
@@ -393,7 +392,7 @@ export function mineplex(username: string) {
           // $(this).find("div.stats-entry").each(function () {
           //   Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: toNumber(clean($(this).find("div.stats-value-daily").text().trim()))});
           // });
-          // if (Object.size(stats)) {
+          // if (size(stats)) {
           //   data.games.push({
           //     game: $(this).find("div.name").text().trim(),
           //     stats
@@ -534,7 +533,7 @@ export function minesaga(username: string, quick: boolean) {
         const data: Data = { games: {} };
 
         const $ = cheerio.load(body);
-        if ($.text().trim().includes("User not found"))
+        if ($("body").text().trim().includes("User not found"))
           return resolve({ errors: "User not found" });
         const name = $(".dd-profile-details h2").text().trim().split(" ")[0];
         const details = $(".dd-profile-details h4").text().split("\n");
@@ -584,7 +583,7 @@ export function gommehd(username: string) {
         }
         var data: Data = { games: [] };
         const $ = cheerio.load(body);
-        if ($.text().trim().includes("User not found"))
+        if ($("body").text().trim().includes("User not found"))
           return resolve({ "errors": "User not found" });
         const name = $("div.user_info").text().trim().split(" ")[0];
         Object.assign(data, { name });
@@ -822,7 +821,7 @@ export function veltpvp(username: string) {
         }
         const data: Data = { games: {} };
         const $ = cheerio.load(body);
-        if ($.text().trim().includes("not found"))
+        if ($("body").text().trim().includes("not found"))
           return resolve({ errors: "User not found" });
         const name = $("h1#name").text().trim();
         let status = $("div.top").text().trim(); // offline/online/banned
@@ -842,7 +841,7 @@ export function veltpvp(username: string) {
         $(".server").each(function () {
           const stats = {};
           $(this).find("div.server-stat").each(function () {
-            Object.assign(stats, { [camelCase($(this).find(".server-stat-description").text().trim().toLowerCase()).replace(/ /g, "_")]: Number($(this).find(".server-stat-number").text().trim().toLowerCase().replace("n/a", 0)) });
+            Object.assign(stats, { [camelCase($(this).find(".server-stat-description").text().trim().toLowerCase()).replace(/ /g, "_")]: Number($(this).find(".server-stat-number").text().trim().toLowerCase().replace("n/a", "0")) });
           });
           if ($(this).find(".server-header").text().trim().toLowerCase().length > 0)
             data.games[$(this).find(".server-header").text().trim().toLowerCase()] = stats;
@@ -872,7 +871,7 @@ export function universocraft(username: string) {
         }
         const data: Data = { games: {} };
         const $ = cheerio.load(body);
-        if ($.text().text().trim().includes("No se ha encontrado"))
+        if ($("body").text().trim().includes("No se ha encontrado"))
           return resolve({ errors: "User not found" });
         const clean = (input: string) => {
           input = input.toUpperCase();
@@ -938,8 +937,8 @@ export function universocraft(username: string) {
         };
 
         const name = $("div.player-info h1").text().trim();
-        const rank = $("div.player-rank").text().trim().toProperCase();
-        let lastLogin = $("div.player-description p").not("p strong").text().trim().toProperCase();
+        const rank = toProperCase($("div.player-rank").text().trim());
+        let lastLogin = toProperCase($("div.player-description p").not("p strong").text().trim());
         lastLogin = lastLogin.replace(/ÚLtima Conexiónhace |ÚLtima Conexión /g, "");
         if (lastLogin === "Hace unos días...")
           lastLogin = "A few days ago";

@@ -1,0 +1,47 @@
+import { mccentral, munchymc, funcraft, mineplex, manacube, minesaga, gommehd, timolia, veltpvp, universocraft, hypixelBoosters, hivemc, wynncraft } from "../built/index.js";
+
+const main = async () => {
+  mccentral("kitpvp", "leaderboard").then(r => console.log(r));
+  munchymc("badboyhalo", "player").then(r => console.log(r)); 
+  // mc.hypixelPlayer("Dinnerbone").then(r => console.log(r));
+  // mc.blocksmc("_IPlozSawdadawd". "player").then(r => console.log(r));
+  funcraft("nathan818").then(r => console.log(r));
+  mineplex("xeiu").then(r => console.log(r));
+  manacube("KaiYara12").then(r => console.log(r));
+  minesaga("doitnowornever").then(r => console.log(r));
+  gommehd("YouBetterGoAfk").then(r => console.log(r));
+  timolia("XxSt3gsfanxX").then(r => console.log(r));
+  veltpvp("DissTracks").then(r => console.log(r));
+  universocraft("ImOvee_Idk").then(r => console.log(r));
+  // hypixelBoosters().then(r => console.log(r));
+  hivemc("Gooogle_it", "profile").then(r => console.log(r));
+  hivemc("jonas2246", "SG").then(r => console.log(r));
+  hivemc("Tutle", "BP").then(r => console.log(r));
+  hivemc("Ingola", "CAI").then(r => console.log(r));
+  hivemc("Endlen", "CR").then(r => console.log(r));
+  hivemc("kaiurii", "DR").then(r => console.log(r));
+  hivemc("Limimin", "HB").then(r => console.log(r));
+  hivemc("Limimin", "HB").then(r => console.log(r));
+  hivemc("Caro", "HERO").then(r => console.log(r));
+  hivemc("Spenken", "HIDE").then(r => console.log(r));
+  hivemc("AslanThePro", "OITC").then(r => console.log(r));
+  hivemc("Demon2921", "SP").then(r => console.log(r));
+  hivemc("HeinzBeans", "TIMV").then(r => console.log(r));
+  hivemc("Rinjani", "SKY").then(r => console.log(r));
+  hivemc("Mcae", "DRAW").then(r => console.log(r));
+  hivemc("Varsel", "SLAP").then(r => console.log(r));
+  hivemc("Mackan__", "EF").then(r => console.log(r));
+  hivemc("Conga_", "MM").then(r => console.log(r));
+  hivemc("ShooterGHP", "GRAV").then(r => console.log(r));
+  hivemc("Bgbros", "RR").then(r => console.log(r));
+  hivemc("RageStateOfMind", "GNT").then(r => console.log(r));
+  hivemc("iiAnass", "SGN").then(r => console.log(r));
+  hivemc("Fcssy", "BD").then(r => console.log(r));
+  hivemc("IDontExquseYou", "SPL").then(r => console.log(r));
+  hivemc("Marleeey", "MIMV").then(r => console.log(r));
+  hivemc("HappyStateOfMind", "BED").then(r => console.log(r));
+  wynncraft("player", "1MCRocker").then(r => console.log(r));
+  wynncraft("guild", "Imperial").then(r => console.log(r));
+};
+
+main();

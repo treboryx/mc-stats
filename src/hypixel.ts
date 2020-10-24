@@ -138,8 +138,10 @@ export async function hypixelPlayer(username: string, key: string) {
         const rank_plus_colour = player.rankPlusColor || "None";
         const most_recent_game = player.mostRecentGameType || "None";
         const total_tokens = player.tournamentTokens || 0;
-
-        const parkour_completions = {};
+        interface par {
+          [key: string]: any
+        }
+        const parkour_completions: par = {};
         if (player.parkourCompletions) {
           Object.keys(player.parkourCompletions).forEach((i) => {
             parkour_completions[i] = {

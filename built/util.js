@@ -8,28 +8,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import fetch from "node-fetch"; // Main http module
-import { load } from "cheerio";
+import cheerio from "cheerio";
 import moment, { duration as _duration, unix } from "moment";
-import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild, hypixelGuild as _hypixelGuild } from "./hypixel";
+// import { hypixelPlayer as _hypixelPlayer, hypixelFindGuild as _hypixelFindGuild, hypixelGuild as _hypixelGuild } from "./hypixel";
 import "moment-duration-format";
-String.prototype.toProperCase = function () {
-    return this.replace(/([^\W_]+[^\s-]*) */g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-};
-Object.size = (obj) => {
+function toProperCase(str) {
+    return str.replace(/([^\W_]+[^\s-]*) */g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+}
+;
+function size(obj) {
     var size = 0, key;
     for (key in obj) {
         if (obj.hasOwnProperty(key))
             size++;
     }
     return size;
-};
+}
+;
 const camelCase = (val) => {
     if (val.includes(" ")) {
         const t = val.split(" ");
         const res = [];
         res.push(t[0]);
         for (let k = 1; t.length > k; k++) {
-            res.push(t[k].toProperCase());
+            res.push(toProperCase(t[k]));
         }
         return res.join("");
     }
@@ -53,7 +55,7 @@ export function blocksmc(query, type) {
                 .then(body => {
                 const data = [];
                 const template = [];
-                const $ = load(body);
+                const $ = cheerio.load(body);
                 $("thead").find("td").each(function () {
                     const stat = $(this).text().trim().replace(/\s\s|^Av$/g, "").toLowerCase().replace("#", "rank").replace("w/l", "winLossRatio").replace("k/d", "killDeathRatio");
                     if (stat.length > 0)
@@ -63,7 +65,7 @@ export function blocksmc(query, type) {
                     const stat = $(this).text().trim().replace(/\s\s/g, "").split(" ");
                     const obj = {};
                     for (let i = 0; i < template.length; i++) {
-                        obj[template[i]] = !isNaN(stat[i]) ? Number(stat[i]) : stat[i];
+                        obj[String(template[i])] = !isNaN(Number(stat[i])) ? Number(stat[i]) : stat[i];
                     }
                     data.push(obj);
                 });
@@ -80,7 +82,7 @@ export function blocksmc(query, type) {
                 .then(res => res.text())
                 .then(body => {
                 const data = { games: {} };
-                const $ = load(body);
+                const $ = cheerio.load(body);
                 const name = $(".profile-header h1").text().trim();
                 const rank = $(".profile-rank").text().replace("\n", "").trim();
                 const timePlayed = $("h1[dir=ltr]").text().replace("\n", "").trim();
@@ -117,134 +119,125 @@ export function blocksmc(query, type) {
         });
     }
 }
-export function hypixelPlayer(username, key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            if (!username)
-                return resolve({
-                    "errors": "No username provided"
-                });
-            if (!key)
-                return resolve({
-                    "errors": "No Hypixel API key provided"
-                });
-            _hypixelPlayer(username, key).then(r => resolve(r));
-        });
-    });
-}
-export function hypixelFindGuild(search, type, key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            if (!search)
-                return resolve({
-                    "errors": "No search term provided"
-                });
-            if (!type)
-                return resolve({
-                    "errors": "No search type provided"
-                });
-            if (!key)
-                return resolve({
-                    "errors": "No Hypixel API key provided"
-                });
-            _hypixelFindGuild(search, type, key).then(r => resolve(r));
-        });
-    });
-}
-export function hypixelGuild(id, key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            if (!id)
-                return resolve({
-                    "errors": "No guild ID provided"
-                });
-            if (!key)
-                return resolve({
-                    "errors": "No Hypixel API key provided"
-                });
-            _hypixelGuild(id, key).then(r => resolve(r));
-        });
-    });
-}
-export function hypixelWatchdog(key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            fetch(`https://api.hypixel.net/watchdogstats?key=${key}`)
-                .then(res => res.json())
-                .then((json) => __awaiter(this, void 0, void 0, function* () {
-                resolve(json);
-            })).catch(e => {
-                resolve({ "errors": "Can't fetch stats, API is probably offline." });
-                console.log(e);
-            });
-        });
-    });
-}
-export function hypixelBoosters(key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            const getGametype = {
-                2: "QUAKECRAFT",
-                3: "WALLS",
-                4: "PAINTBALL",
-                5: "Blitz Survival Games",
-                6: "TNT GAMES",
-                7: "VAMPIREZ",
-                13: "Mega Walls",
-                14: "ARCADE",
-                17: "ARENA",
-                20: "UHC Champions",
-                21: "Cops and Crims",
-                23: "Warlords",
-                24: "Smash Heroes",
-                25: "Turbo Kart Racers",
-                26: "Housing",
-                51: "SkyWars",
-                52: "Crazy Walls",
-                54: "Speed UHC",
-                55: "SkyClash",
-                56: "Classic Games",
-                57: "Prototype",
-                58: "Bed Wars",
-                59: "Murder Mystery",
-                60: "Build Battle",
-                61: "Duels",
-            };
-            fetch(`https://api.hypixel.net/boosters?key=${key}`)
-                .then(res => res.json())
-                .then((json) => __awaiter(this, void 0, void 0, function* () {
-                if (!json.success)
-                    return resolve({ "errors": "There are no active boosters" });
-                const arr = [];
-                json.boosters.forEach((e) => __awaiter(this, void 0, void 0, function* () {
-                    const entry = {
-                        game: getGametype[e.gameType],
-                        multiplier: `x${e.amount}`,
-                        remaining: _duration(e.length, "seconds").format(" m [mins], s [secs]"),
-                        originalLength: _duration(e.originalLength, "seconds").format(" m [mins], s [secs]"),
-                        activated: e.dateActivated
-                    };
-                    arr.push(entry);
-                }));
-                resolve(arr);
-            }));
-        });
-    });
-}
-export function hypixelKey(key) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            fetch(`https://api.hypixel.net/key?key=${key}`)
-                .then(res => res.json())
-                .then((json) => __awaiter(this, void 0, void 0, function* () {
-                resolve(json);
-            })).catch(e => {
-                resolve({ "errors": "Can't fetch stats, API is probably offline." });
-                console.log(e);
-            });
-        });
-    });
-}
+// export async function hypixelPlayer(username: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!username)
+//       return resolve({
+//         "errors": "No username provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelPlayer(username, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelFindGuild(search: string, type: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!search)
+//       return resolve({
+//         "errors": "No search term provided"
+//       });
+//     if (!type)
+//       return resolve({
+//         "errors": "No search type provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelFindGuild(search, type, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelGuild(id: string, key: string) {
+//   return new Promise((resolve, reject) => {
+//     if (!id)
+//       return resolve({
+//         "errors": "No guild ID provided"
+//       });
+//     if (!key)
+//       return resolve({
+//         "errors": "No Hypixel API key provided"
+//       });
+//     _hypixelGuild(id, key).then(r => resolve(r));
+//   });
+// }
+// export async function hypixelWatchdog(key: string) {
+//   return new Promise((resolve, reject) => {
+//     fetch(`https://api.hypixel.net/watchdogstats?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         resolve(json);
+//       }).catch(e => {
+//         resolve({ "errors": "Can't fetch stats, API is probably offline." });
+//         console.log(e);
+//       });
+//   });
+// }
+// export async function hypixelBoosters(key: string) {
+//   return new Promise((resolve, reject) => {
+//     interface Game {
+//       [key: string]: string
+//     }
+//     const getGametype: Game = {
+//       2: "QUAKECRAFT",
+//       3: "WALLS",
+//       4: "PAINTBALL",
+//       5: "Blitz Survival Games",
+//       6: "TNT GAMES",
+//       7: "VAMPIREZ",
+//       13: "Mega Walls",
+//       14: "ARCADE",
+//       17: "ARENA",
+//       20: "UHC Champions",
+//       21: "Cops and Crims",
+//       23: "Warlords",
+//       24: "Smash Heroes",
+//       25: "Turbo Kart Racers",
+//       26: "Housing",
+//       51: "SkyWars",
+//       52: "Crazy Walls",
+//       54: "Speed UHC",
+//       55: "SkyClash",
+//       56: "Classic Games",
+//       57: "Prototype",
+//       58: "Bed Wars",
+//       59: "Murder Mystery",
+//       60: "Build Battle",
+//       61: "Duels",
+//     };
+//     fetch(`https://api.hypixel.net/boosters?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         if (!json.success)
+//           return resolve({ "errors": "There are no active boosters" });
+//         const arr: object[] = [];
+//         json.boosters.forEach(async (e: { gameType: string; amount: any; length: moment.DurationInputArg1; originalLength: moment.DurationInputArg1; dateActivated: any; }) => {
+//           const entry = {
+//             game: getGametype[e.gameType],
+//             multiplier: `x${e.amount}`,
+//             remaining: _duration(e.length, "seconds").format(" m [mins], s [secs]"),
+//             originalLength: _duration(e.originalLength, "seconds").format(" m [mins], s [secs]"),
+//             activated: e.dateActivated
+//           };
+//           arr.push(entry);
+//         });
+//         resolve(arr);
+//       });
+//   });
+// }
+// export async function hypixelKey(key: string) {
+//   return new Promise((resolve, reject) => {
+//     fetch(`https://api.hypixel.net/key?key=${key}`)
+//       .then(res => res.json())
+//       .then(async (json) => {
+//         resolve(json);
+//       }).catch(e => {
+//         resolve({ "errors": "Can't fetch stats, API is probably offline." });
+//         console.log(e);
+//       });
+//   });
+// }
 export function funcraft(username) {
     return new Promise((resolve, reject) => {
         if (!username)
@@ -307,11 +300,11 @@ export function funcraft(username) {
                 }
             };
             const data = { games: {} };
-            const $ = load(body);
+            const $ = cheerio.load(body);
             if ($("div[class='container alert-container']").text().trim().includes("× Une ou plusieurs erreurs sont survenues :"))
                 return resolve({ errors: "User does not have any information" });
-            function formatTimeFuncraft(date) {
-                date = date.split(" ");
+            function formatTimeFuncraft(_date) {
+                const date = _date.split(" ");
                 var day = date[0];
                 var year = date[2].replace(",", "");
                 var time = date[3].replace("h", ":");
@@ -369,9 +362,10 @@ export function funcraft(username) {
             $("div.col-md-4").each(function () {
                 const stats = {};
                 $(this).find("div.stats-entry").each(function () {
-                    Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: Number(toNumber(clean($(this).find("div.stats-value-daily").text().trim())).replace(/-/g, 0).replace(/h|m|,| /g, "")) });
+                    var _a, _b;
+                    Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: Number((_b = (_a = toNumber(clean($(this).find("div.stats-value-daily").text().trim()))) === null || _a === void 0 ? void 0 : _a.replace(/-/g, "0")) === null || _b === void 0 ? void 0 : _b.replace(/h|m|,| /g, "")) });
                 });
-                if (Object.size(stats)) {
+                if (size(stats)) {
                     data.games[$(this).find("div.name").text().trim().replace("Infecté", "Infected")] = stats;
                 }
             });
@@ -390,7 +384,7 @@ export function mineplex(username) {
             .then(res => res.text())
             .then(body => {
             const data = { games: [] };
-            const $ = load(body);
+            const $ = cheerio.load(body);
             const name = $(".www-mp-username").text().trim();
             const rank = $("span[class=\"www-mp-rank\"]").text().trim();
             const gamesPlayed = $("div[class='lbl lbl-me']").text().trim().split(" ")[0];
@@ -400,7 +394,7 @@ export function mineplex(username) {
                 // $(this).find("div.stats-entry").each(function () {
                 //   Object.assign(stats, { [clean($(this).find("div.stats-name").text().trim().toLowerCase())]: toNumber(clean($(this).find("div.stats-value-daily").text().trim()))});
                 // });
-                // if (Object.size(stats)) {
+                // if (size(stats)) {
                 //   data.games.push({
                 //     game: $(this).find("div.name").text().trim(),
                 //     stats
@@ -526,8 +520,8 @@ export function minesaga(username, quick) {
             .then(res => res.text())
             .then((body) => __awaiter(this, void 0, void 0, function* () {
             const data = { games: {} };
-            const $ = load(body);
-            if ($.text().trim().includes("User not found"))
+            const $ = cheerio.load(body);
+            if ($("body").text().trim().includes("User not found"))
                 return resolve({ errors: "User not found" });
             const name = $(".dd-profile-details h2").text().trim().split(" ")[0];
             const details = $(".dd-profile-details h4").text().split("\n");
@@ -545,7 +539,7 @@ export function minesaga(username, quick) {
                 const game = games[i].replace(/\s\s/g, "");
                 if (game.length > 0) {
                     const d = yield fetch(`https://www.minesaga.org/player/${username}/${game}`).then(res => res.text());
-                    const $ = load(d);
+                    const $ = cheerio.load(d);
                     const stats = {};
                     $("div.dd-section").each(function () {
                         $(this).find("div.dd-stats").each(function () {
@@ -572,8 +566,8 @@ export function gommehd(username) {
             .then(res => res.text())
             .then((body) => __awaiter(this, void 0, void 0, function* () {
             var data = { games: [] };
-            const $ = load(body);
-            if ($.text().trim().includes("User not found"))
+            const $ = cheerio.load(body);
+            if ($("body").text().trim().includes("User not found"))
                 return resolve({ "errors": "User not found" });
             const name = $("div.user_info").text().trim().split(" ")[0];
             Object.assign(data, { name });
@@ -704,7 +698,7 @@ export function timolia(username) {
                 }
             };
             const data = { totalWins: 0, totalKills: 0, totalDeaths: 0, totalGamesPlayed: 0, games: {} };
-            const $ = load(body);
+            const $ = cheerio.load(body);
             const name = $("h2#playername").text().trim();
             if (!name)
                 return resolve({ errors: "User not found" });
@@ -738,7 +732,7 @@ export function timolia(username) {
                         }
                         $(this).find(".stats-table-field").each(function () {
                             const objName = clean($(this).find("td").not(".align-right").text());
-                            let objValue = $(this).find("td").last().text().replace("Sek.", "Seconds");
+                            let objValue = Number($(this).find("td").last().text().replace("Sek.", "Seconds"));
                             if (!isNaN(objValue))
                                 objValue = Number(objValue);
                             if (objName === "games_played")
@@ -788,8 +782,8 @@ export function veltpvp(username) {
                 return `${moment(final).format("MMM Do YYYY")} (${moment(final).fromNow()})`;
             };
             const data = { games: {} };
-            const $ = load(body);
-            if ($.text().trim().includes("not found"))
+            const $ = cheerio.load(body);
+            if ($("body").text().trim().includes("not found"))
                 return resolve({ errors: "User not found" });
             const name = $("h1#name").text().trim();
             let status = $("div.top").text().trim(); // offline/online/banned
@@ -802,13 +796,16 @@ export function veltpvp(username) {
             else if (status === "online") {
                 seen = $("div.bottom").text().trim();
             }
+            else {
+                seen = "";
+            }
             const rank = $("div#profile h2").text().trim();
             const firstLogin = calcFirstLogin($("div.content strong").text().trim().substring(0, 10));
             Object.assign(data, { name, status, rank, firstLogin, seen });
             $(".server").each(function () {
                 const stats = {};
                 $(this).find("div.server-stat").each(function () {
-                    Object.assign(stats, { [camelCase($(this).find(".server-stat-description").text().trim().toLowerCase()).replace(/ /g, "_")]: Number($(this).find(".server-stat-number").text().trim().toLowerCase().replace("n/a", 0)) });
+                    Object.assign(stats, { [camelCase($(this).find(".server-stat-description").text().trim().toLowerCase()).replace(/ /g, "_")]: Number($(this).find(".server-stat-number").text().trim().toLowerCase().replace("n/a", "0")) });
                 });
                 if ($(this).find(".server-header").text().trim().toLowerCase().length > 0)
                     data.games[$(this).find(".server-header").text().trim().toLowerCase()] = stats;
@@ -832,8 +829,8 @@ export function universocraft(username) {
             .then(res => res.text())
             .then((body) => __awaiter(this, void 0, void 0, function* () {
             const data = { games: {} };
-            const $ = load(body);
-            if ($.text().trim().includes("No se ha encontrado"))
+            const $ = cheerio.load(body);
+            if ($("body").text().trim().includes("No se ha encontrado"))
                 return resolve({ errors: "User not found" });
             const clean = (input) => {
                 input = input.toUpperCase();
@@ -926,8 +923,8 @@ export function universocraft(username) {
                 }
             };
             const name = $("div.player-info h1").text().trim();
-            const rank = $("div.player-rank").text().trim().toProperCase();
-            let lastLogin = $("div.player-description p").not("p strong").text().trim().toProperCase();
+            const rank = toProperCase($("div.player-rank").text().trim());
+            let lastLogin = toProperCase($("div.player-description p").not("p strong").text().trim());
             lastLogin = lastLogin.replace(/ÚLtima Conexiónhace |ÚLtima Conexión /g, "");
             if (lastLogin === "Hace unos días...")
                 lastLogin = "A few days ago";
@@ -1021,13 +1018,13 @@ export function hivemc(username, type) {
         if (type === "profile") {
             fetch(`http://api.hivemc.com/v1/player/${username}`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                if (String(body).includes("Sorry, the page you are looking for could not be found")) {
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                if (String(_body).includes("Sorry, the page you are looking for could not be found")) {
                     return resolve({
                         errors: "No data found for user: " + username
                     });
                 }
-                body = JSON.parse(body);
+                const body = JSON.parse(_body);
                 let achievements;
                 const rank = body.modernRank.human || 0;
                 const tokens = body.tokens || 0;
@@ -1050,7 +1047,7 @@ export function hivemc(username, type) {
             // fetch(`http://api.hivemc.com/v1/player/${username}/SG`)
             //   .then(res => res.text())
             //   .then(async body => {
-            //     body = JSON.parse(body);
+            //     body = JSON.parse(_body);
             //     if (body.code === 404 && body.short === "noprofile") return resolve({ errors: `No ${type} data found for user: ${username}` });
             //     let achievements;
             //     const victories = body.victories || 0;
@@ -1073,8 +1070,8 @@ export function hivemc(username, type) {
         if (type === "BP") { // block party
             fetch(`http://api.hivemc.com/v1/player/${username}/BP`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1095,8 +1092,8 @@ export function hivemc(username, type) {
         if (type === "CAI") { // Cowboys and Indians
             fetch(`http://api.hivemc.com/v1/player/${username}/CAI`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1120,8 +1117,8 @@ export function hivemc(username, type) {
         if (type === "CR") { // Cranked
             fetch(`http://api.hivemc.com/v1/player/${username}/CR`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1149,8 +1146,8 @@ export function hivemc(username, type) {
         if (type === "DR") { // Death run
             fetch(`http://api.hivemc.com/v1/player/${username}/DR`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1178,8 +1175,8 @@ export function hivemc(username, type) {
         if (type === "HB") { // The Herobrine
             fetch(`http://api.hivemc.com/v1/player/${username}/HB`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1200,8 +1197,8 @@ export function hivemc(username, type) {
         if (type === "HERO") { // SG:heros
             fetch(`http://api.hivemc.com/v1/player/${username}/HERO`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1227,8 +1224,8 @@ export function hivemc(username, type) {
         if (type === "HIDE") { // Hide and seek
             fetch(`http://api.hivemc.com/v1/player/${username}/HIDE`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1253,8 +1250,8 @@ export function hivemc(username, type) {
         if (type === "OITC") { // One In The Chanber
             fetch(`http://api.hivemc.com/v1/player/${username}/OITC`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1277,8 +1274,8 @@ export function hivemc(username, type) {
         if (type === "SP") { // Splegg
             fetch(`http://api.hivemc.com/v1/player/${username}/SP`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1302,8 +1299,8 @@ export function hivemc(username, type) {
         if (type === "TIMV") { // Trouble in Mineville
             fetch(`http://api.hivemc.com/v1/player/${username}/TIMV`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1327,7 +1324,7 @@ export function hivemc(username, type) {
             // fetch(`http://api.hivemc.com/v1/player/${username}/SKY`)
             //   .then(res => res.text())
             //   .then(async body => {
-            //     body = JSON.parse(body);
+            //     body = JSON.parse(_body);
             //     if (body.code === 404 && body.short === "noprofile") return resolve({ errors: `No ${type} data found for user: ${username}` });
             //     let achievements;
             //     const total_points = body.total_points || 0;
@@ -1348,8 +1345,8 @@ export function hivemc(username, type) {
         if (type === "DRAW") { // Draw it
             fetch(`http://api.hivemc.com/v1/player/${username}/DRAW`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1371,8 +1368,8 @@ export function hivemc(username, type) {
         if (type === "SLAP") { // Slaparoo
             fetch(`http://api.hivemc.com/v1/player/${username}/SLAP`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const victories = body.victories || 0;
@@ -1389,8 +1386,8 @@ export function hivemc(username, type) {
         if (type === "EF") { // Electric Floor
             fetch(`http://api.hivemc.com/v1/player/${username}/EF`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const victories = body.victories || 0;
@@ -1407,8 +1404,8 @@ export function hivemc(username, type) {
         if (type === "MM") { // Music Masters
             fetch(`http://api.hivemc.com/v1/player/${username}/MM`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const victories = body.victories || 0;
@@ -1427,8 +1424,8 @@ export function hivemc(username, type) {
         if (type === "GRAV") { // Gravity
             fetch(`http://api.hivemc.com/v1/player/${username}/GRAV`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const victories = body.victories || 0;
@@ -1445,8 +1442,8 @@ export function hivemc(username, type) {
         if (type === "RR") { // Restaurant Rush
             fetch(`http://api.hivemc.com/v1/player/${username}/RR`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1467,8 +1464,8 @@ export function hivemc(username, type) {
         if (type === "GNT") { // SkyGiants
             fetch(`http://api.hivemc.com/v1/player/${username}/GNT`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const total_points = body.total_points || 0;
@@ -1490,7 +1487,7 @@ export function hivemc(username, type) {
             // fetch(`http://api.hivemc.com/v1/player/${username}/SGN`)
             //   .then(res => res.text())
             //   .then(async body => {
-            //     body = JSON.parse(body);
+            //     body = JSON.parse(_body);
             //     if (body.code === 404 && body.short === "noprofile") return resolve({ errors: `No ${type} data found for user: ${username}` });
             //     const victories = body.victories || 0;
             //     const total_points = body.total_points || 0;
@@ -1508,8 +1505,8 @@ export function hivemc(username, type) {
         if (type === "BD") { // BatteryDash
             fetch(`http://api.hivemc.com/v1/player/${username}/BD`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 const total_points = body.total_points || 0;
@@ -1527,8 +1524,8 @@ export function hivemc(username, type) {
         if (type === "SPL") { // Sploop
             fetch(`http://api.hivemc.com/v1/player/${username}/SPL`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1602,8 +1599,8 @@ export function hivemc(username, type) {
         if (type === "MIMV") { // Murder In MineVille
             fetch(`http://api.hivemc.com/v1/player/${username}/MIMV`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1625,8 +1622,8 @@ export function hivemc(username, type) {
         if (type === "BED") { // Bedwars
             fetch(`http://api.hivemc.com/v1/player/${username}/BED`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 && body.short === "noprofile")
                     return resolve({ errors: `No ${type} data found for user: ${username}` });
                 let achievements;
@@ -1651,8 +1648,8 @@ export function hivemc(username, type) {
         if (type === "leaderboards") {
             fetch(`http://api.hivemc.com/v1/game/${username}/leaderboard/`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404)
                     return resolve({ errors: body.message });
                 resolve(body.leaderboard);
@@ -1673,8 +1670,8 @@ export function wynncraft(type, name) {
         if (type === "player") {
             fetch(`https://api.wynncraft.com/v2/player/${name}/stats`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.code === 404 || (body.code === 400 && body.message === "Bad Request") || body.data.length === 0) {
                     return resolve({
                         errors: `No player data found for user: ${name}`
@@ -1787,14 +1784,14 @@ export function wynncraft(type, name) {
         if (type === "guild") {
             fetch(`https://api.wynncraft.com/public_api.php?action=guildStats&command=${name}`)
                 .then(res => res.text())
-                .then((body) => __awaiter(this, void 0, void 0, function* () {
-                body = JSON.parse(body);
+                .then((_body) => __awaiter(this, void 0, void 0, function* () {
+                const body = JSON.parse(_body);
                 if (body.error === "Guild not found")
                     return resolve({
                         "errors": `No guild data found for guild: ${name}`
                     });
                 const data = {};
-                const name = body.name || "None";
+                const _name = body.name || "None";
                 const prefix = body.prefix || "None";
                 const xp = body.xp || 0;
                 const level = body.level || 0;
@@ -1810,7 +1807,7 @@ export function wynncraft(type, name) {
                     const guild_recruiter = body.members.filter((guild) => guild.rank == "RECRUITER");
                     Object.assign(data, { members, guild_owner, guild_chief, guild_recruit, guild_captain, guild_recruiter });
                 }
-                Object.assign(data, { name, prefix, xp, level, created, territories, banner });
+                Object.assign(data, { _name, prefix, xp, level, created, territories, banner });
                 resolve(data);
             }));
         }
@@ -1823,11 +1820,10 @@ export function munchymc(query, type) {
                 .then(res => res.text())
                 .then(body => {
                 const data = {};
-                const $ = load(body);
+                const $ = cheerio.load(body);
                 $($("div.col-md-4").length > 0 ? "div.col-md-4" : "div.col-md-6").each(function () {
                     const leaderboard = $(this).find("div.caption-stats").text().trim().replace(/ /g, "");
                     if (leaderboard.length > 0) {
-                        data[leaderboard] = [];
                         $(this).find(".list-group-item").each(function () {
                             const stat = $(this).text().trim().replace(/\s\s /g, "").replace(/#[0-9]{1,2} {1,3}/, "").replace(/ {2}/, " ").split(/ /);
                             data[leaderboard].push({ username: stat[0], value: stat[1] });
@@ -1846,8 +1842,8 @@ export function munchymc(query, type) {
             fetch(`https://www.munchymc.com/profile/${query}`)
                 .then(res => res.text())
                 .then(body => {
-                const data = { games: {} };
-                const $ = load(body);
+                // const data: object = { games: {} };
+                const $ = cheerio.load(body);
                 if ($("div.col-md-12").text().includes("Looks like we couldn't find that name in our database!")) {
                     return resolve({
                         "errors": `No inforamtion was found for ${query}`
@@ -1860,62 +1856,66 @@ export function munchymc(query, type) {
                         details.push(($(this).text().trim().replace(/(\s){2,}/g, "")));
                     });
                 });
-                data.rank = details[0].replace("Rank: ", "");
-                data.status = details[1].replace("Status:", "");
-                data.tokens = details[2].replace("Tokens:", "");
-                data.firstLogin = details[3].replace("Joined: ", "");
-                data.lastLogin = details[4].replace("Last Login: ", "");
                 $("span[class=\"badge\"]").each(function () {
                     statistics.push(($(this).text().trim().replace(/\s*/g, "")));
                 });
-                data.games.woolwars = {
-                    wins: Number(statistics[0]) || 0,
-                    games: Number(statistics[1]) || 0,
-                    kills: Number(statistics[2]) || 0,
-                };
-                data.games.skywars = {
-                    wins: Number(statistics[4]) || 0,
-                    games: Number(statistics[5]) || 0,
-                    kills: Number(statistics[6]) || 0,
-                    deaths: Number(statistics[7]) || 0,
-                };
-                data.games.mazerunner = {
-                    wins: Number(statistics[8]) || 0,
-                    games: Number(statistics[9]) || 0,
-                    kills: Number(statistics[10]) || 0,
-                    princess_kills: Number(statistics[11]) || 0,
-                };
-                data.games.classic_hungergames = {
-                    wins: Number(statistics[12]) || 0,
-                    games: Number(statistics[13]) || 0,
-                    kills: Number(statistics[14]) || 0,
-                    most_kills: Number(statistics[15]) || 0,
-                };
-                data.games.kitpvp = {
-                    best_kill_streak: Number(statistics[16]) || 0,
-                    casual: {
-                        kills: Number(statistics[18]) || 0,
-                        deaths: Number(statistics[19]) || 0
-                    },
-                    competitive: {
-                        kills: Number(statistics[21]) || 0,
-                        deaths: Number(statistics[22]) || 0
-                    },
-                    arena: {
-                        kills: Number(statistics[24]) || 0,
-                        deaths: Number(statistics[25]) || 0,
-                        elo: Number(statistics[26]) || 0
-                    },
-                    brackets: {
-                        games: Number(statistics[28]) || 0,
-                        wins: Number(statistics[29]) || 0
+                const data = {
+                    rank: details[0].replace("Rank: ", ""),
+                    status: details[1].replace("Status:", ""),
+                    tokens: details[2].replace("Tokens:", ""),
+                    firstLogin: details[3].replace("Joined: ", ""),
+                    lastLogin: details[4].replace("Last Login: ", ""),
+                    games: {
+                        woolwars: {
+                            wins: Number(statistics[0]) || 0,
+                            games: Number(statistics[1]) || 0,
+                            kills: Number(statistics[2]) || 0
+                        },
+                        skywars: {
+                            wins: Number(statistics[4]) || 0,
+                            games: Number(statistics[5]) || 0,
+                            kills: Number(statistics[6]) || 0,
+                            deaths: Number(statistics[7]) || 0,
+                        },
+                        mazerunner: {
+                            wins: Number(statistics[8]) || 0,
+                            games: Number(statistics[9]) || 0,
+                            kills: Number(statistics[10]) || 0,
+                            princess_kills: Number(statistics[11]) || 0,
+                        },
+                        classic_hungergames: {
+                            wins: Number(statistics[12]) || 0,
+                            games: Number(statistics[13]) || 0,
+                            kills: Number(statistics[14]) || 0,
+                            most_kills: Number(statistics[15]) || 0,
+                        },
+                        kitpvp: {
+                            best_kill_streak: Number(statistics[16]) || 0,
+                            casual: {
+                                kills: Number(statistics[18]) || 0,
+                                deaths: Number(statistics[19]) || 0
+                            },
+                            competitive: {
+                                kills: Number(statistics[21]) || 0,
+                                deaths: Number(statistics[22]) || 0
+                            },
+                            arena: {
+                                kills: Number(statistics[24]) || 0,
+                                deaths: Number(statistics[25]) || 0,
+                                elo: Number(statistics[26]) || 0
+                            },
+                            brackets: {
+                                games: Number(statistics[28]) || 0,
+                                wins: Number(statistics[29]) || 0
+                            }
+                        },
+                        prison: {
+                            blocks_mined: Number(statistics[34]) || 0,
+                            balance: Number(statistics[35]) || 0,
+                            kills: Number(statistics[36]) || 0,
+                            best_kill_streak: Number(statistics[37]) || 0,
+                        }
                     }
-                };
-                data.games.prison = {
-                    blocks_mined: Number(statistics[34]) || 0,
-                    balance: Number(statistics[35]) || 0,
-                    kills: Number(statistics[36]) || 0,
-                    best_kill_streak: Number(statistics[37]) || 0,
                 };
                 return resolve(data);
             }).catch(e => {
@@ -1973,153 +1973,139 @@ export function mccentral(query, type) {
                 const data = [];
                 if (body.aaData.length > 0) {
                     body.aaData.forEach((i) => {
-                        if (leaderboardName === "fsurvival") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                kills: Number(i[4]),
-                                deaths: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "fskywars") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                kills: Number(i[4]),
-                                deaths: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "fwalls") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                kills: Number(i[4]),
-                                deaths: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "fctf") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                kills: Number(i[4]),
-                                deaths: Number(i[5]),
-                                flags_captured: Number(i[6]),
-                            });
-                        }
-                        if (leaderboardName === "fmurder") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                murderer_kills: Number(i[4]),
-                                bystander_kills: Number(i[5]),
-                                karma: Number(i[6]),
-                            });
-                        }
-                        if (leaderboardName === "fchamps") {
-                            data.push({
-                                username: i[1],
-                                blocks_placed: i[2],
-                                blocks_broken: i[3],
-                                wins: Number(i[4]),
-                                games: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "fcakewars") {
-                            data.push({
-                                username: i[1],
-                                games: Number(i[2]),
-                                wins: Number(i[3]),
-                                kills: Number(i[4]),
-                                deaths: Number(i[5]),
-                                cakes_destroyed: Number(i[6]),
-                            });
-                        }
-                        if (leaderboardName === "uhcserver") {
-                            data.push({
-                                username: i[1],
-                                wins: Number(i[2]),
-                                kills: Number(i[3]),
-                                deaths: Number(i[4]),
-                                gapples: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "sbNewReset1") {
-                            data.push({
-                                username: i[1],
-                                level: i[2],
-                                value: i[3],
-                                hoppers: Number(i[4]),
-                                spawners: i[5],
-                            });
-                        }
-                        if (leaderboardName === "sbNewReset2") {
-                            data.push({
-                                username: i[1],
-                                level: i[2],
-                                value: i[3],
-                                hoppers: Number(i[4]),
-                                spawners: i[5],
-                            });
-                        }
-                        if (leaderboardName === "survival") {
-                            data.push({
-                                username: i[1],
-                                balance: i[2],
-                                kills: Number(i[3]),
-                                deaths: Number(i[4]),
-                                quests: Number(i[5]),
-                            });
-                        }
-                        if (leaderboardName === "facs") {
-                            data.push({
-                                username: i[1],
-                                wealth: i[2],
-                                spawners: Number(i[3]),
-                            });
-                        }
-                        if (leaderboardName === "prison") {
-                            data.push({
-                                username: i[1],
-                                prison: i[2],
-                                kills: Number(i[3]),
-                                deaths: Number(i[4]),
-                                blocks_mined: i[5],
-                                gang: i[6],
-                            });
-                        }
-                        if (leaderboardName === "prison2") {
-                            data.push({
-                                username: i[1],
-                                prison: i[2],
-                                kills: Number(i[3]),
-                                deaths: Number(i[4]),
-                                blocks_mined: i[5],
-                                gang: i[6],
-                            });
-                        }
-                        if (leaderboardName === "nkitpvp") {
-                            data.push({
-                                username: i[1],
-                                kills: Number(i[2]),
-                                deaths: Number(i[3]),
-                                level: Number(i[4]),
-                                gapples: Number(i[5]),
-                                events_won: Number(i[6]),
-                            });
-                        }
-                        if (leaderboardName === "arenapvp2") {
-                            data.push({
-                                username: i[1],
-                                duels: Number(i[2]),
-                                duels_won: Number(i[3]),
-                                win_ratio: i[4],
-                                duels_rank: i[5]
-                            });
+                        switch (leaderboardName) {
+                            case "fsurvival":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    kills: Number(i[4]),
+                                    deaths: Number(i[5]),
+                                });
+                            case "fskywars":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    kills: Number(i[4]),
+                                    deaths: Number(i[5]),
+                                });
+                            case "fwalls":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    kills: Number(i[4]),
+                                    deaths: Number(i[5]),
+                                });
+                            case "fctf":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    kills: Number(i[4]),
+                                    deaths: Number(i[5]),
+                                    flags_captured: Number(i[6]),
+                                });
+                            case "fmurder":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    murderer_kills: Number(i[4]),
+                                    bystander_kills: Number(i[5]),
+                                    karma: Number(i[6]),
+                                });
+                            case "fchaps":
+                                data.push({
+                                    username: i[1],
+                                    blocks_placed: i[2],
+                                    blocks_broken: i[3],
+                                    wins: Number(i[4]),
+                                    games: Number(i[5]),
+                                });
+                            case "fcakewars":
+                                data.push({
+                                    username: i[1],
+                                    games: Number(i[2]),
+                                    wins: Number(i[3]),
+                                    kills: Number(i[4]),
+                                    deaths: Number(i[5]),
+                                    cakes_destroyed: Number(i[6]),
+                                });
+                            case "uhcserver":
+                                data.push({
+                                    username: i[1],
+                                    wins: Number(i[2]),
+                                    kills: Number(i[3]),
+                                    deaths: Number(i[4]),
+                                    gapples: Number(i[5]),
+                                });
+                            case "sbNewReset1":
+                                data.push({
+                                    username: i[1],
+                                    level: i[2],
+                                    value: i[3],
+                                    hoppers: Number(i[4]),
+                                    spawners: i[5],
+                                });
+                            case "sbNewReset2":
+                                data.push({
+                                    username: i[1],
+                                    level: i[2],
+                                    value: i[3],
+                                    hoppers: Number(i[4]),
+                                    spawners: i[5],
+                                });
+                            case "survival":
+                                data.push({
+                                    username: i[1],
+                                    balance: i[2],
+                                    kills: Number(i[3]),
+                                    deaths: Number(i[4]),
+                                    quests: Number(i[5]),
+                                });
+                            case "facs":
+                                data.push({
+                                    username: i[1],
+                                    wealth: i[2],
+                                    spawners: Number(i[3]),
+                                });
+                            case "prison":
+                                data.push({
+                                    username: i[1],
+                                    prison: i[2],
+                                    kills: Number(i[3]),
+                                    deaths: Number(i[4]),
+                                    blocks_mined: i[5],
+                                    gang: i[6],
+                                });
+                            case "prison2":
+                                data.push({
+                                    username: i[1],
+                                    prison: i[2],
+                                    kills: Number(i[3]),
+                                    deaths: Number(i[4]),
+                                    blocks_mined: i[5],
+                                    gang: i[6],
+                                });
+                            case "nkitpvp":
+                                data.push({
+                                    username: i[1],
+                                    kills: Number(i[2]),
+                                    deaths: Number(i[3]),
+                                    level: Number(i[4]),
+                                    gapples: Number(i[5]),
+                                    events_won: Number(i[6]),
+                                });
+                            case "arenapvp2":
+                                data.push({
+                                    username: i[1],
+                                    duels: Number(i[2]),
+                                    duels_won: Number(i[3]),
+                                    win_ratio: i[4],
+                                    duels_rank: i[5]
+                                });
                         }
                     });
                     resolve(data);
@@ -2135,246 +2121,114 @@ export function mccentral(query, type) {
     }
     if (type === "player") {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            const data = {
-                survival_games: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0
-                },
-                skywars: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0
-                },
-                walls: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0
-                },
-                ctf: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0,
-                    flags_captured: 0
-                },
-                murder: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    murderer_kills: 0,
-                    bystander_kills: 0,
-                    karma: 0
-                },
-                champs: {
-                    rank: 0,
-                    blocks_placed: 0,
-                    blocks_broken: 0,
-                    wins: 0,
-                    games: 0
-                },
-                cakewars: {
-                    rank: 0,
-                    games: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0,
-                    cakes_destroyed: 0
-                },
-                uhc: {
-                    rank: 0,
-                    wins: 0,
-                    kills: 0,
-                    deaths: 0,
-                    gapples: 0
-                },
-                skyblock1: {
-                    rank: 0,
-                    level: 0,
-                    value: 0,
-                    hoppers: 0,
-                    spawners: 0
-                },
-                skyblock2: {
-                    rank: 0,
-                    level: 0,
-                    value: 0,
-                    hoppers: 0,
-                    spawners: 0
-                },
-                survival: {
-                    rank: 0,
-                    balance: 0,
-                    kills: 0,
-                    deaths: 0,
-                    quests: 0
-                },
-                factions: {
-                    rank: 0,
-                    wealth: 0,
-                    spawners: 0,
-                },
-                prison1: {
-                    rank: 0,
-                    prison: 0,
-                    kills: 0,
-                    deaths: 0,
-                    blocks_mined: 0,
-                    gang: 0
-                },
-                prison2: {
-                    rank: 0,
-                    prison: 0,
-                    kills: 0,
-                    deaths: 0,
-                    blocks_mined: 0,
-                    gang: 0
-                },
-                kitpvp: {
-                    rank: 0,
-                    kills: 0,
-                    deaths: 0,
-                    level: 0,
-                    gapples: 0,
-                    highest_streak: 0,
-                    events_won: 0
-                },
-                arenapvp: {
-                    rank: 0,
-                    duels: 0,
-                    duels_won: 0,
-                    win_ratio: 0,
-                    duels_rank: 0,
-                },
-            };
+            const data = {};
             const games = ["fsurvival", "fskywars", "fwalls", "fctf", "fmurder", "fchamps", "fcakewars", "uhcserver", "sbNewReset1", "sbNewReset2", "survival", "facs", "prison", "prison2", "nkitpvp", "arenapvp2"];
             for (let i = 0; i < games.length; i++) {
                 yield fetch(`https://mccentral.org/leaderboards-storage/leader/scripts/${games[i]}.php?sSearch=${query}&bRegex=false&sSearch_0=&bRegex_0=false&bSearchable_0=true&sSearch_1=&bRegex_1=false&bSearchable_1=true&sSearch_2=&bRegex_2=false&bSearchable_2=true&sSearch_3=&bRegex_3=false&bSearchable_3=true&sSearch_4=&bRegex_4=false&bSearchable_4=true&sSearch_5=&bRegex_5=false&bSearchable_5=true&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1&bSortable_0=false&bSortable_1=false&bSortable_2=false&bSortable_3=false&bSortable_4=false&bSortable_5=false`)
                     .then(res => res.json())
                     .then(body => {
                     if (body.aaData.length > 0 && body.aaData[0][1].toLowerCase() === query.toLowerCase()) {
-                        if (games[i] === "fsurvival") {
-                            data.survival_games.rank = Number(body.aaData[0][0]);
-                            data.survival_games.games = Number(body.aaData[0][2]);
-                            data.survival_games.wins = Number(body.aaData[0][3]);
-                            data.survival_games.kills = Number(body.aaData[0][4]);
-                            data.survival_games.deaths = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "fskywars") {
-                            data.skywars.rank = Number(body.aaData[0][0]);
-                            data.skywars.games = Number(body.aaData[0][2]);
-                            data.skywars.wins = Number(body.aaData[0][3]);
-                            data.skywars.kills = Number(body.aaData[0][4]);
-                            data.skywars.deaths = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "fwalls") {
-                            data.walls.rank = Number(body.aaData[0][0]);
-                            data.walls.games = Number(body.aaData[0][2]);
-                            data.walls.wins = Number(body.aaData[0][3]);
-                            data.walls.kills = Number(body.aaData[0][4]);
-                            data.walls.deaths = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "fctf") {
-                            data.ctf.rank = Number(body.aaData[0][0]);
-                            data.ctf.games = Number(body.aaData[0][2]);
-                            data.ctf.wins = Number(body.aaData[0][3]);
-                            data.ctf.kills = Number(body.aaData[0][4]);
-                            data.ctf.deaths = Number(body.aaData[0][5]);
-                            data.ctf.flags_captured = Number(body.aaData[0][6]);
-                        }
-                        if (games[i] === "fmurder") {
-                            data.murder.rank = Number(body.aaData[0][0]);
-                            data.murder.games = Number(body.aaData[0][2]);
-                            data.murder.wins = Number(body.aaData[0][3]);
-                            data.murder.murderer_kills = Number(body.aaData[0][4]);
-                            data.murder.bystander_kills = Number(body.aaData[0][5]);
-                            data.murder.karma = Number(body.aaData[0][6]);
-                        }
-                        if (games[i] === "fchamps") {
-                            data.champs.rank = Number(body.aaData[0][0]);
-                            data.champs.blocks_placed = body.aaData[0][2];
-                            data.champs.blocks_broken = body.aaData[0][3];
-                            data.champs.wins = Number(body.aaData[0][4]);
-                            data.champs.games = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "fcakewars") {
-                            data.cakewars.rank = Number(body.aaData[0][0]);
-                            data.cakewars.games = Number(body.aaData[0][2]);
-                            data.cakewars.wins = Number(body.aaData[0][3]);
-                            data.cakewars.kills = Number(body.aaData[0][4]);
-                            data.cakewars.deaths = Number(body.aaData[0][5]);
-                            data.cakewars.cakes_destroyed = Number(body.aaData[0][6]);
-                        }
-                        if (games[i] === "uhcserver") {
-                            data.uhc.rank = Number(body.aaData[0][0]);
-                            data.uhc.wins = Number(body.aaData[0][2]);
-                            data.uhc.kills = Number(body.aaData[0][3]);
-                            data.uhc.deaths = Number(body.aaData[0][4]);
-                            data.uhc.gapples = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "sbNewReset1") {
-                            data.skyblock1.rank = Number(body.aaData[0][0]);
-                            data.skyblock1.level = body.aaData[0][2];
-                            data.skyblock1.value = body.aaData[0][3];
-                            data.skyblock1.hoppers = Number(body.aaData[0][4]);
-                            data.skyblock1.spawners = body.aaData[0][5];
-                        }
-                        if (games[i] === "sbNewReset2") {
-                            data.skyblock2.rank = Number(body.aaData[0][0]);
-                            data.skyblock2.level = body.aaData[0][2];
-                            data.skyblock2.value = body.aaData[0][3];
-                            data.skyblock2.hoppers = Number(body.aaData[0][4]);
-                            data.skyblock2.spawners = body.aaData[0][5];
-                        }
-                        if (games[i] === "survival") {
-                            data.survival.rank = Number(body.aaData[0][0]);
-                            data.survival.balance = body.aaData[0][2];
-                            data.survival.kills = Number(body.aaData[0][3]);
-                            data.survival.deaths = Number(body.aaData[0][4]);
-                            data.survival.quests = Number(body.aaData[0][5]);
-                        }
-                        if (games[i] === "factions") {
-                            data.factions.rank = Number(body.aaData[0][0]);
-                            data.factions.wealth = body.aaData[0][2];
-                            data.factions.spawners = Number(body.aaData[0][3]);
-                        }
-                        if (games[i] === "prison") {
-                            data.prison1.rank = Number(body.aaData[0][0]);
-                            data.prison1.prison = body.aaData[0][2];
-                            data.prison1.kills = Number(body.aaData[0][3]);
-                            data.prison1.deaths = Number(body.aaData[0][4]);
-                            data.prison1.blocks_mined = body.aaData[0][5];
-                            data.prison1.gang = body.aaData[0][6];
-                        }
-                        if (games[i] === "prison2") {
-                            data.prison2.rank = Number(body.aaData[0][0]);
-                            data.prison2.prison = body.aaData[0][2];
-                            data.prison2.kills = Number(body.aaData[0][3]);
-                            data.prison2.deaths = Number(body.aaData[0][4]);
-                            data.prison2.blocks_mined = body.aaData[0][5];
-                            data.prison2.gang = body.aaData[0][6];
-                        }
-                        if (games[i] === "nkitpvp") {
-                            data.kitpvp.rank = Number(body.aaData[0][0]);
-                            data.kitpvp.kills = Number(body.aaData[0][2]);
-                            data.kitpvp.deaths = Number(body.aaData[0][3]);
-                            data.kitpvp.level = Number(body.aaData[0][4]);
-                            data.kitpvp.gapples = Number(body.aaData[0][5]);
-                            data.kitpvp.events_won = Number(body.aaData[0][6]);
-                        }
-                        if (games[i] === "arenapvp2") {
-                            data.arenapvp.rank = Number(body.aaData[0][0]);
-                            data.arenapvp.duels = Number(body.aaData[0][2]);
-                            data.arenapvp.duels_won = Number(body.aaData[0][3]);
-                            data.arenapvp.win_ratio = body.aaData[0][4];
-                            data.arenapvp.duels_rank = body.aaData[0][5];
+                        switch (games[i]) {
+                            case "fsurvival":
+                                data.survival_games.rank = Number(body.aaData[0][0]);
+                                data.survival_games.games = Number(body.aaData[0][2]);
+                                data.survival_games.wins = Number(body.aaData[0][3]);
+                                data.survival_games.kills = Number(body.aaData[0][4]);
+                                data.survival_games.deaths = Number(body.aaData[0][5]);
+                            case "fskywars":
+                                data.skywars.rank = Number(body.aaData[0][0]);
+                                data.skywars.games = Number(body.aaData[0][2]);
+                                data.skywars.wins = Number(body.aaData[0][3]);
+                                data.skywars.kills = Number(body.aaData[0][4]);
+                                data.skywars.deaths = Number(body.aaData[0][5]);
+                            case "fwalls":
+                                data.walls.rank = Number(body.aaData[0][0]);
+                                data.walls.games = Number(body.aaData[0][2]);
+                                data.walls.wins = Number(body.aaData[0][3]);
+                                data.walls.kills = Number(body.aaData[0][4]);
+                                data.walls.deaths = Number(body.aaData[0][5]);
+                            case "fctf":
+                                data.ctf.rank = Number(body.aaData[0][0]);
+                                data.ctf.games = Number(body.aaData[0][2]);
+                                data.ctf.wins = Number(body.aaData[0][3]);
+                                data.ctf.kills = Number(body.aaData[0][4]);
+                                data.ctf.deaths = Number(body.aaData[0][5]);
+                                data.ctf.flags_captured = Number(body.aaData[0][6]);
+                            case "fmurder":
+                                data.murder.rank = Number(body.aaData[0][0]);
+                                data.murder.games = Number(body.aaData[0][2]);
+                                data.murder.wins = Number(body.aaData[0][3]);
+                                data.murder.murderer_kills = Number(body.aaData[0][4]);
+                                data.murder.bystander_kills = Number(body.aaData[0][5]);
+                                data.murder.karma = Number(body.aaData[0][6]);
+                            case "fchamps":
+                                data.champs.rank = Number(body.aaData[0][0]);
+                                data.champs.blocks_placed = body.aaData[0][2];
+                                data.champs.blocks_broken = body.aaData[0][3];
+                                data.champs.wins = Number(body.aaData[0][4]);
+                                data.champs.games = Number(body.aaData[0][5]);
+                            case "fcakewars":
+                                data.cakewars.rank = Number(body.aaData[0][0]);
+                                data.cakewars.games = Number(body.aaData[0][2]);
+                                data.cakewars.wins = Number(body.aaData[0][3]);
+                                data.cakewars.kills = Number(body.aaData[0][4]);
+                                data.cakewars.deaths = Number(body.aaData[0][5]);
+                                data.cakewars.cakes_destroyed = Number(body.aaData[0][6]);
+                            case "uhcserver":
+                                data.uhc.rank = Number(body.aaData[0][0]);
+                                data.uhc.wins = Number(body.aaData[0][2]);
+                                data.uhc.kills = Number(body.aaData[0][3]);
+                                data.uhc.deaths = Number(body.aaData[0][4]);
+                                data.uhc.gapples = Number(body.aaData[0][5]);
+                            case "sbNewReset1":
+                                data.skyblock1.rank = Number(body.aaData[0][0]);
+                                data.skyblock1.level = body.aaData[0][2];
+                                data.skyblock1.value = body.aaData[0][3];
+                                data.skyblock1.hoppers = Number(body.aaData[0][4]);
+                                data.skyblock1.spawners = body.aaData[0][5];
+                            case "sbNewReset2":
+                                data.skyblock2.rank = Number(body.aaData[0][0]);
+                                data.skyblock2.level = body.aaData[0][2];
+                                data.skyblock2.value = body.aaData[0][3];
+                                data.skyblock2.hoppers = Number(body.aaData[0][4]);
+                                data.skyblock2.spawners = body.aaData[0][5];
+                            case "survival":
+                                data.survival.rank = Number(body.aaData[0][0]);
+                                data.survival.balance = body.aaData[0][2];
+                                data.survival.kills = Number(body.aaData[0][3]);
+                                data.survival.deaths = Number(body.aaData[0][4]);
+                                data.survival.quests = Number(body.aaData[0][5]);
+                            case "factions":
+                                data.factions.rank = Number(body.aaData[0][0]);
+                                data.factions.wealth = body.aaData[0][2];
+                                data.factions.spawners = Number(body.aaData[0][3]);
+                            case "prison":
+                                data.prison1.rank = Number(body.aaData[0][0]);
+                                data.prison1.prison = body.aaData[0][2];
+                                data.prison1.kills = Number(body.aaData[0][3]);
+                                data.prison1.deaths = Number(body.aaData[0][4]);
+                                data.prison1.blocks_mined = body.aaData[0][5];
+                                data.prison1.gang = body.aaData[0][6];
+                            case "prison2":
+                                data.prison2.rank = Number(body.aaData[0][0]);
+                                data.prison2.prison = body.aaData[0][2];
+                                data.prison2.kills = Number(body.aaData[0][3]);
+                                data.prison2.deaths = Number(body.aaData[0][4]);
+                                data.prison2.blocks_mined = body.aaData[0][5];
+                                data.prison2.gang = body.aaData[0][6];
+                            case "nkitpvp":
+                                data.kitpvp.rank = Number(body.aaData[0][0]);
+                                data.kitpvp.kills = Number(body.aaData[0][2]);
+                                data.kitpvp.deaths = Number(body.aaData[0][3]);
+                                data.kitpvp.level = Number(body.aaData[0][4]);
+                                data.kitpvp.gapples = Number(body.aaData[0][5]);
+                                data.kitpvp.events_won = Number(body.aaData[0][6]);
+                            case "arenapvp2":
+                                data.arenapvp.rank = Number(body.aaData[0][0]);
+                                data.arenapvp.duels = Number(body.aaData[0][2]);
+                                data.arenapvp.duels_won = Number(body.aaData[0][3]);
+                                data.arenapvp.win_ratio = body.aaData[0][4];
+                                data.arenapvp.duels_rank = body.aaData[0][5];
                         }
                     }
                 }).catch(e => {
