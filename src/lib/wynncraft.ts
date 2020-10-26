@@ -1,7 +1,7 @@
-import cheerio from 'cheerio';
+import moment, { duration as _duration } from 'moment';
 import fetch from 'node-fetch'; // Main http module
 export function wynncraft(type: string, name: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     if (!name)
       return resolve({
         errors: 'No username or guild name provided',

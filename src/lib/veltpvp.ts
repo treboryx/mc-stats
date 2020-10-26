@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
 import fetch from 'node-fetch'; // Main http module
 export function veltpvp(username: string) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve, _reject) => {
     if (!username) return resolve({ errors: 'No username provided' });
     fetch(`https://www.veltpvp.com/u/${username}`)
       .then((res) => res.text())
