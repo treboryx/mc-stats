@@ -49,10 +49,10 @@ export function funcraft(username: string) {
           }
         };
         type Data1 = {
-          readonly [key: string]: object;
+          [key: string]: Record<string, unknown>
         };
         type Data = {
-          readonly games: Data1;
+          games: Data1;
         };
         const data: Data = { games: {} };
         const $ = cheerio.load(body);

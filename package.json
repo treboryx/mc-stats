@@ -2,9 +2,6 @@
   "name": "mc-stats",
   "version": "1.0.7",
   "description": "Wrapper for fetching player stats from popular Minecraft networks.",
-  "bin": {
-    "typescript-starter": "./bin/typescript-starter"
-  },
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
@@ -42,8 +39,6 @@
     "validate-npm-package-name": "^3.0.0"
   },
   "devDependencies": {
-    "@ava/typescript": "^1.1.1",
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/cheerio": "^0.22.22",
     "@types/gradient-string": "^1.1.1",
     "@types/inquirer": "^7.3.1",
@@ -55,10 +50,6 @@
     "@types/validate-npm-package-name": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
-    "ava": "^3.12.1",
-    "codecov": "^3.5.0",
-    "cspell": "^4.1.0",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -68,8 +59,6 @@
     "md5-file": "^5.0.0",
     "nock": "^13.0.4",
     "npm-run-all": "^4.1.5",
-    "nyc": "^15.1.0",
-    "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
     "standard-version": "^9.0.0",
     "ts-node": "^9.0.0",
@@ -87,23 +76,7 @@
     "test:lint": "eslint src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:spelling": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
-    "test:unit": "nyc --silent ava",
-    "check-cli": "run-s test diff-integration-tests check-integration-tests",
-    "check-integration-tests": "run-s check-integration-test:*",
-    "check-integration-test:1": "cd test/test-1 && npm i && npm run build && npm run test",
-    "check-integration-test:2": "cd test/test-2 && yarn && yarn build && yarn test",
-    "check-integration-test:3": "cd test/test-3 && yarn && yarn build && yarn test",
-    "check-integration-test:4": "cd test/test-4 && npm i && npm run build && npm run test",
-    "check-integration-test:5": "cd test/test-5 && npm i && npm run build && npm run test",
-    "check-integration-test:6": "cd test/test-6 && yarn && yarn build && yarn test",
-    "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
     "watch:build": "tsc -p tsconfig.json -w",
-    "watch:test": "nyc --silent ava --watch",
-    "cov": "run-s build test:unit cov:html cov:lcov && open-cli coverage/index.html",
-    "cov:html": "nyc report --reporter=html",
-    "cov:lcov": "nyc report --reporter=lcov",
-    "cov:send": "run-s cov:lcov && codecov",
-    "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
     "doc": "run-s doc:html && open-cli build/docs/index.html",
     "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
@@ -124,36 +97,7 @@
     "LICENSE",
     "README.md"
   ],
-  "ava": {
-    "failFast": true,
-    "timeout": "60s",
-    "typescript": {
-      "rewritePaths": {
-        "src/": "build/main/"
-      }
-    },
-    "files": [
-      "!diff",
-      "!test",
-      "!build/module/**"
-    ],
-    "ignoredByWatcher": [
-      "diff",
-      "test"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
   "prettier": {
     "singleQuote": true
-  },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "exclude": [
-      "**/*.spec.js"
-    ]
   }
 }
