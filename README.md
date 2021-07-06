@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/treboryx/mc-stats/wiki" target="_blank">Documentation</a> •
-    <a href="https://www.craftybot.xyz/" target="_blank">Crafty Discord bot</a> •
+    <a href="https://crafty.gg/bot" target="_blank">Crafty Discord bot</a> •
     <a href="https://discord.gg/zB6fEQW/" target="_blank">Support Discord server</a>
 </p>
 
