@@ -16,18 +16,12 @@
         "SwitchCase": 1
       }
     ],
-    "linebreak-style": [
-      "error",
-      "windows"
-    ],
-    "quotes": [
-      "warn",
-      "double"
-    ],
-    "semi": [
-      "warn",
-      "always"
-    ],
+    "linebreak-style": ["error", "windows"],
+    "quotes": ["warn", "double"],
+    // "semi": [
+    //   "warn",
+    //   "always"
+    // ],
     "keyword-spacing": [
       "error",
       {
@@ -58,14 +52,8 @@
         "ignoreReadBeforeAssign": false
       }
     ],
-    "no-unused-vars": [
-      "off"
-    ],
-    "no-prototype-builtins": [
-      "off"
-    ],
-    "no-async-promise-executor": [
-      "off"
-    ]
+    "no-unused-vars": ["off"],
+    "no-prototype-builtins": ["off"],
+    "no-async-promise-executor": ["off"]
   }
 }

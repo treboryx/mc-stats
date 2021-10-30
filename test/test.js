@@ -2,7 +2,7 @@ const mc = require("../app.js");
 
 const main = async () => {
   // mc.mccentral("kitpvp", "leaderboard").then(r => console.log(r));
-  // mc.munchymc("badboyhalo", "player").then(r => console.log(r));
+  // mc.munchymc("badboyhalo", "player").then((r) => console.log(r));
   // mc.hypixelPlayer("Dinnerbone").then(r => console.log(r));
   // mc.blocksmc("_IPlozSawdadawd". "player").then(r => console.log(r));
   // mc.funcraft("nathan818").then(r => console.log(r));
@@ -10,7 +10,7 @@ const main = async () => {
   // mc.manacube("KaiYara12").then(r => console.log(r));
   // mc.minesaga("doitnowornever").then(r => console.log(r));
   // mc.gommehd("YouBetterGoAfk").then(r => console.log(r));
-  // mc.timolia("XxSt3gsfanxX").then(r => console.log(r));
+  // mc.timolia("Flycofx").then((r) => console.log(r));
   // mc.minemen("Cleid").then(r => console.log(r));
   // mc.veltpvp("DissTracks").then(r => console.log(r));
   // mc.universocraft("ImOvee_Idk").then(r => console.log(r));
