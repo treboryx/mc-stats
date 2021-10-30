@@ -1,6 +1,6 @@
 {
   "name": "mc-stats",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Wrapper for fetching player stats from popular Minecraft networks.",
   "author": "Robert (Discord: Robert#0006), Tj (Discord: Tj#0215)",
   "license": "MIT",
