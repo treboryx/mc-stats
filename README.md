@@ -1,3 +1,4 @@
+[![NPM](https://nodei.co/npm/mc-stats.png)](https://nodei.co/npm/mc-stats/)
 <h1 align="center">
     <br/>
     Minecraft server player statistics
