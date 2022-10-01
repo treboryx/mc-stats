@@ -1,6 +1,7 @@
 const mc = require("../app.js");
 
 const main = async () => {
+  mc.comugamers("Jojo1545", "player").then((r) => console.log(r));
   // mc.mccentral("kitpvp", "leaderboard").then(r => console.log(r));
   // mc.munchymc("badboyhalo", "player").then((r) => console.log(r));
   // mc.hypixelPlayer("Dinnerbone").then(r => console.log(r));
